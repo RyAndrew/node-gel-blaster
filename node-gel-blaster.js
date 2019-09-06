@@ -16,47 +16,30 @@ const httpPort = 8080;
 var options = {
 	i2c: i2cBus.openSync(1),
 	address: 0x40,
-	frequency: 50,
-	debug: true
+	frequency: 50
+	//debug: true
 };
 
 
 // variables used in servoLoop
 var pwm;
-var pwmChannel = 1;
+var pwmPanChannel = 1;
 var timer;
 
-var up = true;
 
-function servoLoop() {
-	timer = setTimeout(servoLoop, 1000);
-
-	if (up) {
-		console.log('down!');
-		up = false;
-		pwm.setPulseLength(pwmChannel, 800);
-	} else {
-		console.log('up!');
-		up = true;
-		pwm.setPulseLength(pwmChannel, 2200);
+pwm = new pca9685.Pca9685Driver(options, function startLoop(err) {
+	if (err) {
+		console.error("Error initializing PCA9685");
+		process.exit(-1);
 	}
 
-}
-
-
-// set-up CTRL-C with graceful shutdown
-process.on("SIGINT", function () {
-	console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
-
-	if (timer) {
-		clearTimeout(timer);
-		timer = null;
-	}
-
-	pwm.dispose();
-
-	process.exit(-1);
+	console.log("PCA9685 Initialized");
 });
+
+pwm.setPulseLength(pwmPanChannel, 800);
+
+
+
 
 const webSocketServer = new WebSocket.Server({ noServer: true });
 
@@ -67,6 +50,35 @@ webSocketServer.on('connection', function connection(ws, req) {
 
 	ws.on('message', function incoming(message) {
 		console.log('received: %s', message);
+		
+		let messageJson;
+		try{
+			messageJson = JSON.parse(message);
+		}catch(err) {
+			console.log('invalid json message');
+			console.log(err);
+			return;
+		}
+		if(!messageJson.action){
+			console.log('invalid json message, missing action');
+			return;
+		}
+		switch(messageJson.action){
+			case "updateSteering":
+				if(!messageJson.value){
+					console.log('invalid json message, missing value');
+					return;
+				}
+				let pwmValue = Math.round(800 + (1400 * (parseInt(messageJson.value)/1000)));
+				console.log('update steering = '+messageJson.value+' / pwm '+pwmValue);
+				
+				pwm.setPulseLength(pwmPanChannel, pwmValue);
+
+				break;
+			default:
+				console.log("invalid action!");
+				return;
+		}
 	});
 
 	ws.on('close', function clear() {
@@ -153,13 +165,11 @@ httpServer.on('upgrade', function upgrade(request, socket, head) {
 });
 
 
+// set-up CTRL-C with graceful shutdown
+process.on("SIGINT", function () {
+	console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
 
-pwm = new pca9685.Pca9685Driver(options, function startLoop(err) {
-	if (err) {
-		console.error("Error initializing PCA9685");
-		process.exit(-1);
-	}
+	pwm.dispose();
 
-	console.log("Starting servo loop...");
-	servoLoop();
+	process.exit(-1);
 });
