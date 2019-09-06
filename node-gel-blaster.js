@@ -21,13 +21,10 @@ var options = {
 };
 
 
-// variables used in servoLoop
-var pwm;
 var pwmPanChannel = 1;
-var timer;
+var pwmFireChannel = 14;
 
-
-pwm = new pca9685.Pca9685Driver(options, function startLoop(err) {
+var pwm = new pca9685.Pca9685Driver(options, function startLoop(err) {
 	if (err) {
 		console.error("Error initializing PCA9685");
 		process.exit(-1);
@@ -74,6 +71,20 @@ webSocketServer.on('connection', function connection(ws, req) {
 				
 				pwm.setPulseLength(pwmPanChannel, pwmValue);
 
+				break;
+				
+			case "updateThrottle":
+				if(!messageJson.value){
+					console.log('invalid json message, missing value');
+					return;
+				}
+				if(messageJson.value >= 960){
+					console.log("FIRE!");
+					pwm.setPulseLength(pwmFireChannel, 4096);
+				}else{
+					console.log("STOP FIRE!");
+					pwm.setPulseLength(pwmFireChannel, 0);
+				}
 				break;
 			default:
 				console.log("invalid action!");
