@@ -30,12 +30,13 @@ var pwmTiltChannel = 14;
 
 var steeringValue = 500; // midpoint - straight foward
 
-var throttleThreshold = 10.0
+var throttleThreshold = 60.0
 var throttleMidpoint = 500.0
 
-var motorPwmMax = 4095
-var motorPwmRange = 1000.0
-var motorPwmOffset = motorPwmMax - motorPwmRange
+var motorPercentMin = 0.2; // 20% pwm duty cycle for minimum motor movement
+//var motorPwmMax = 4095
+//var motorPwmRange = 1000.0
+//var motorPwmOffset = motorPwmMax - motorPwmRange
 
 var pwmShootChannel = 1;
 
@@ -50,72 +51,6 @@ var pwm = new pca9685.Pca9685Driver(options, function startLoop(err) {
 
 pwm.setPulseLength(pwmPanChannel, 1500);
 pwm.setPulseLength(pwmTiltChannel, 1500);
-
-// function sendPwm(channel, onStep, offStep){
-
-//     const channel0OnStepLowByte = 0x06; // LED0_ON_L
-//     const channel0OnStepHighByte = 0x07; // LED0_ON_H
-//     const channel0OffStepLowByte = 0x08; // LED0_OFF_L
-//     const channel0OffStepHighByte = 0x09; // LED0_OFF_H
-//     const registersPerChannel = 4;
-
-// 	pwm.send([
-// 		{ command: channel0OnStepLowByte + registersPerChannel * channel, byte: onStep & 0xFF },
-//         { command: channel0OnStepHighByte + registersPerChannel * channel, byte: (onStep >> 8) & 0x0F },
-//         { command: channel0OffStepLowByte + registersPerChannel * channel, byte: offStep & 0xFF },
-//         { command: channel0OffStepHighByte + registersPerChannel * channel, byte: (offStep >> 8) & 0x0F }
-// 	], 
-// 	() => { return; }
-// 	);
-
-// }
-
-
-// function motorSetPercent(motorNo, direction, throttlePercent){
-// 	let pinPwm, pinin1, pinin2;
-
-// 	switch (motorNo) {
-// 		default:
-// 			console.log("invalid motor! "+ motorNo);
-// 			return;
-// 		case 1:
-// 			pinPwm = 2;
-// 			pinin1 = 4;
-// 			pinin2 = 3;
-// 			break;
-// 		case 2:
-// 			pinPwm = 7;
-// 			pinin1 = 6;
-// 			pinin2 = 5;
-// 			break;
-// 	}
-
-// 	var onValue = 4096;
-
-// 	if (throttlePercent == 0) {
-// 		sendPwm(pinPwm, 0, onValue);
-// 		sendPwm(pinin1, 0, onValue);
-// 		sendPwm(pinin2, 0, onValue);
-// 	}else{
-
-// 		if (direction >= 1) {
-// 			//pwm.setPulseLength(pinin1, 0, onValue);
-// 			//pwm.setPulseLength(pinin2, onValue, 0);
-// 			sendPwm(pinin1, 0, onValue);
-// 			sendPwm(pinin2, onValue, 0);
-// 		} else {
-// 			sendPwm(pinin1, onValue, 0);
-// 			sendPwm(pinin2, 0, onValue);
-// 		}
-
-// 		var throttleValue = motorPwmOffset + (motorPwmRange*throttlePercent);
-// 		console.log("motor "+motorNo+" throttle pwm value" +throttleValue);
-
-// 		sendPwm(pinPwm, 0, throttleValue);
-// 		//pwm.setPulseLength(pinPwm, 0, throttleValue);
-// 	}
-// }
-
 
 function motorSetPercent(motorNo, direction, throttlePercent){
 	let pinPwm, pinin1, pinin2;
@@ -136,26 +71,26 @@ function motorSetPercent(motorNo, direction, throttlePercent){
 			break;
 	}
 
-	var onValue = 4095;
-
+	var onValue = 4096;
+	console.log("throttlePercent = "+(throttlePercent*100));
 	if (throttlePercent == 0) {
-		pwm.setPulseLength(pinPwm, 0, onValue);
-		pwm.setPulseLength(pinin1, 0, onValue);
-		pwm.setPulseLength(pinin2, 0, onValue);
+
+		pwm.channelOff(pinin1);
+		pwm.channelOff(pinin2);
+		pwm.channelOff(pinPwm);
 	}else{
 
 		if (direction >= 1) {
-			pwm.setPulseLength(pinin1, 0, onValue);
-			pwm.setPulseLength(pinin2, onValue, 0);
+			pwm.channelOn(pinin2);
+			pwm.channelOff(pinin1);
 		} else {
-			pwm.setPulseLength(pinin1, onValue, 0);
-			pwm.setPulseLength(pinin2, 0, onValue);
+			pwm.channelOff(pinin2);
+			pwm.channelOn(pinin1);
 		}
 
-		var throttleValue = motorPwmOffset + (motorPwmRange*throttlePercent);
-		console.log("motor "+motorNo+" throttle pwm value" +throttleValue);
-
-		pwm.setPulseLength(pinPwm, 0, throttleValue);
+		throttlePercent = motorPercentMin + throttlePercent;
+		console.log("motor "+motorNo+" throttle % = " + throttlePercent);
+		pwm.setDutyCycle(pinPwm, throttlePercent);
 	}
 }
 
@@ -190,10 +125,10 @@ webSocketServer.on('connection', function connection(ws, req) {
 				
 				if(messageJson.value >= 1){
 					console.log("FIRE!");
-					pwm.setPulseLength(pwmShootChannel, 4096);
+					pwm.channelOn(pwmShootChannel);
 				}else{
 					console.log("STOP FIRE!");
-					pwm.setPulseLength(pwmShootChannel, 0);
+					pwm.channelOff(pwmShootChannel);
 				}
 
 				break;
