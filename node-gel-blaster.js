@@ -44,13 +44,13 @@ var pwm = new pca9685.Pca9685Driver(options, function startLoop(err) {
 	if (err) {
 		console.error("Error initializing PCA9685");
 		process.exit(-1);
+		return;
 	}
 
 	console.log("PCA9685 Initialized");
+	pwm.setPulseLength(pwmPanChannel, 1500);
+	pwm.setPulseLength(pwmTiltChannel, 1500);
 });
-
-pwm.setPulseLength(pwmPanChannel, 1500);
-pwm.setPulseLength(pwmTiltChannel, 1500);
 
 function motorSetPercent(motorNo, direction, throttlePercent){
 	let pinPwm, pinin1, pinin2;
@@ -132,25 +132,47 @@ webSocketServer.on('connection', function connection(ws, req) {
 				}
 
 				break;
-			case "setSteering":
-				if(!messageJson.hasOwnProperty('value')){
+			// case "setSteering":
+			// 	if(!messageJson.hasOwnProperty('value')){
+			// 		console.log('invalid json message, missing value');
+			// 		return;
+			// 	}
+			// 	steeringValue = parseInt(messageJson.value);
+			// 	break;
+			//case "setThrottle":
+			case "move":
+				if(!messageJson.hasOwnProperty('y') || !messageJson.hasOwnProperty('x')){
 					console.log('invalid json message, missing value');
 					return;
 				}
-				steeringValue = parseInt(messageJson.value);
+				//move X is throttle
+				//move Y is steering
+				
+				var steeringValue = messageJson.y;
+				var throttleValue = messageJson.x;
 
-				break;
-			case "setThrottle":
-				if(!messageJson.hasOwnProperty('value')){
-					console.log('invalid json message, missing value');
+				//if steering hard then spin in place
+				if(steeringValue >= 800){
+					//hard right
+					steeringValue -= 800;
+					steeringValue /= 200;
+					motorSetPercent(2, 1, steeringValue);
+					motorSetPercent(1, 0, steeringValue);
+					return;
+				}
+				if(steeringValue <= 200){
+					//hard left
+					steeringValue /= 200;
+					steeringValue = 1 - steeringValue;//invert
+
+					motorSetPercent(2, 0, steeringValue);
+					motorSetPercent(1, 1, steeringValue);
 					return;
 				}
 
-				var throttleValue = messageJson.value;
 				if (throttleValue > throttleMidpoint-throttleThreshold && throttleValue < throttleMidpoint+throttleThreshold) {
 
 					console.log("setThrottle stop "+throttleValue);
-
 					motorSetPercent(1, 0, 0);
 					motorSetPercent(2, 0, 0);
 
@@ -292,12 +314,27 @@ httpServer.on('upgrade', function upgrade(request, socket, head) {
 	}
 });
 
+function shutdownPwm(){
+
+	console.log("center all pwm channels");
+	pwm.setPulseLength(pwmPanChannel, 1500);
+	pwm.setPulseLength(pwmTiltChannel, 1500);
+	
+	console.log("stoppnig motors...");
+	// motorSetPercent(1, 0, 0);
+	// motorSetPercent(2, 0, 0);
+
+	// pwm.channelOff(pwmPanChannel);
+	// pwm.channelOff(pwmTiltChannel);
+
+	pwm.dispose();
+}
 
 // set-up CTRL-C with graceful shutdown
 process.on("SIGINT", function () {
 	console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
 
-	pwm.dispose();
+	shutdownPwm();
 
 	process.exit(-1);
 });
