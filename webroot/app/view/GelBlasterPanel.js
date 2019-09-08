@@ -144,7 +144,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
                     itemId: 'trexPanSlider',
                     name: 'trexPanSlider',
                     margin: '0 10 5 10',
-                    label: 'T-Rex Pan',
+                    label: 'Pan',
                     labelWidth: 68,
                     value: 500,
                     liveUpdate: true,
@@ -186,7 +186,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
                     itemId: 'trexTiltSlider',
                     name: 'trexTiltSlider',
                     margin: '0 10 5 10',
-                    label: 'T-Rex Tilt',
+                    label: 'Tilt',
                     labelWidth: 65,
                     value: 500,
                     liveUpdate: true,
@@ -228,7 +228,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
                     itemId: 'trexJawSlider',
                     name: 'trexJawSlider',
                     margin: '0 10 5 10',
-                    label: 'T-Rex Jaw',
+                    label: 'Slider',
                     labelWidth: 65,
                     value: 0,
                     liveUpdate: true,
@@ -699,7 +699,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         if(newValue && newValue.constructor === Array){
             newValue = newValue[0];
         }
-
+        console.log(newValue);
         if(!this.lastSteeringChangeDefered){
             this.lastSteeringChangeDefered = true;
 
@@ -709,7 +709,8 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             }
             Ext.defer(function(){
                 this.lastSteeringChangeDefered = false;
-                var currentValue = field.getValue()[0];
+                var currentValue = field.getValue();
+        console.log(currentValue);
                 if(this.lastSent != currentValue){
                     this.lastSent = currentValue;
                     this.sendUpdateSteering(currentValue);
