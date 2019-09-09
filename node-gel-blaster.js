@@ -104,148 +104,10 @@ webSocketServer.on('connection', function connection(ws, req) {
 
 	const ip = req.connection.remoteAddress;
 	console.log('connection from ' + ip);
-	ws.on('message', function(message){
-		console.log('received: %s', message);
-		
-		let messageJson;
-		try{
-			messageJson = JSON.parse(message);
-		}catch(err) {
-			console.log('invalid json message');
-			console.log(err);
-			return;
-		}
-		if(!messageJson.action){
-			console.log('invalid json message, missing action');
-			return;
-		}
-		switch(messageJson.action){
-			case "stopVideo":
-				stopVideoProcess();
-				break;
-			case "startVideo":
-				startVideoProcess();
-				break;
-			case "readVideoRunning":
-				ws.send('{"msgType":"videoRunning","running":'+(videoRunning?1:0)+'}');
 
-				break;
-			case "setShoot":
-				if(!messageJson.hasOwnProperty('value')){
-					console.log('invalid json message, missing value');
-					return;
-				}
-				
-				if(messageJson.value >= 1){
-					console.log("FIRE!");
-					pwm.channelOn(pwmShootChannel);
-				}else{
-					console.log("STOP FIRE!");
-					pwm.channelOff(pwmShootChannel);
-				}
-
-				break;
-			// case "setSteering":
-			// 	if(!messageJson.hasOwnProperty('value')){
-			// 		console.log('invalid json message, missing value');
-			// 		return;
-			// 	}
-			// 	steeringValue = parseInt(messageJson.value);
-			// 	break;
-			//case "setThrottle":
-			case "move":
-				if(!messageJson.hasOwnProperty('y') || !messageJson.hasOwnProperty('x')){
-					console.log('invalid json message, missing value');
-					return;
-				}
-				//move X is throttle
-				//move Y is steering
-				
-				var steeringValue = messageJson.y;
-				var throttleValue = messageJson.x;
-
-				//if steering hard then spin in place
-				if(steeringValue >= 800){
-					//hard right
-					steeringValue -= 800;
-					steeringValue /= 200;
-					motorSetPercent(2, 1, steeringValue);
-					motorSetPercent(1, 0, steeringValue);
-					return;
-				}
-				if(steeringValue <= 200){
-					//hard left
-					steeringValue /= 200;
-					steeringValue = 1 - steeringValue;//invert
-
-					motorSetPercent(2, 0, steeringValue);
-					motorSetPercent(1, 1, steeringValue);
-					return;
-				}
-
-				if (throttleValue > throttleMidpoint-throttleThreshold && throttleValue < throttleMidpoint+throttleThreshold) {
-
-					console.log("setThrottle stop "+throttleValue);
-					motorSetPercent(1, 0, 0);
-					motorSetPercent(2, 0, 0);
-
-				} else {
-
-					//calc steering offset
-
-					if (throttleValue >= 500) {
-						//forward
-						throttleValue = (throttleValue - 500) / 500;
-
-						console.log("setThrottle fwd throttleValue = "+throttleValue );
-
-						motorSetPercent(1, 1, throttleValue);
-						motorSetPercent(2, 1, throttleValue);
-
-					} else {
-						//reverse
-						throttleValue = (500 - throttleValue) / 500;
-
-						console.log("setThrottle rev throttleValue = "+throttleValue );
-
-						motorSetPercent(1, -1, throttleValue);
-						motorSetPercent(2, -1, throttleValue);
-					}
-				}
-
-				break;
-			case "setTilt":
-				if(!messageJson.hasOwnProperty('value')){
-					console.log('invalid json message, missing value');
-					return;
-				}
-				var servoPercent = messageJson.value / 1000;
-
-				var servoValue = ServoRange * servoPercent + ServoMin;
-
-				console.log('tilt pwm = '+servoValue);
-				pwm.setPulseLength(pwmTiltChannel, servoValue);
-				break;
-			case "setPan":
-				if(!messageJson.hasOwnProperty('value')){
-					console.log('invalid json message, missing value');
-					return;
-				}
-				var servoPercent = messageJson.value / 1000;
-
-				var servoValue = ServoRange * servoPercent + ServoMin;
-
-				console.log('pan pwm = '+servoValue);
-				pwm.setPulseLength(pwmPanChannel, servoValue);
-				break;
-			default:
-				console.log("invalid action!");
-				return;
-		}
+	 ws.on('message', function(message){
+	 	handleIncomingControlMessage(ws, message);
 	});
-	// ws.on('message', function(message){
-	// 	handleIncomingControlMessage(ws, message);
-	// });
 
 	ws.on('close', function clear() {
 		console.log('connection closed for ' + ip);
@@ -255,7 +117,143 @@ webSocketServer.on('connection', function connection(ws, req) {
 });
 
 function handleIncomingControlMessage(ws, message) {
+	console.log('received: %s', message);
+	
+	let messageJson;
+	try{
+		messageJson = JSON.parse(message);
+	}catch(err) {
+		console.log('invalid json message');
+		console.log(err);
+		return;
+	}
+	if(!messageJson.action){
+		console.log('invalid json message, missing action');
+		return;
+	}
+	switch(messageJson.action){
+		case "stopVideo":
+			stopVideoProcess();
+			break;
+		case "startVideo":
+			startVideoProcess();
+			break;
+		case "readVideoRunning":
+			ws.send('{"msgType":"videoRunning","running":'+(videoRunning?1:0)+'}');
 
+			break;
+		case "setShoot":
+			if(!messageJson.hasOwnProperty('value')){
+				console.log('invalid json message, missing value');
+				return;
+			}
+			
+			if(messageJson.value >= 1){
+				console.log("FIRE!");
+				pwm.channelOn(pwmShootChannel);
+			}else{
+				console.log("STOP FIRE!");
+				pwm.channelOff(pwmShootChannel);
+			}
+
+			break;
+		// case "setSteering":
+		// 	if(!messageJson.hasOwnProperty('value')){
+		// 		console.log('invalid json message, missing value');
+		// 		return;
+		// 	}
+		// 	steeringValue = parseInt(messageJson.value);
+		// 	break;
+		//case "setThrottle":
+		case "move":
+			if(!messageJson.hasOwnProperty('y') || !messageJson.hasOwnProperty('x')){
+				console.log('invalid json message, missing value');
+				return;
+			}
+			//move X is throttle
+			//move Y is steering
+			
+			var steeringValue = messageJson.y;
+			var throttleValue = messageJson.x;
+
+			//if steering hard then spin in place
+			if(steeringValue >= 800){
+				//hard right
+				steeringValue -= 800;
+				steeringValue /= 200;
+				motorSetPercent(2, 1, steeringValue);
+				motorSetPercent(1, 0, steeringValue);
+				return;
+			}
+			if(steeringValue <= 200){
+				//hard left
+				steeringValue /= 200;
+				steeringValue = 1 - steeringValue;//invert
+
+				motorSetPercent(2, 0, steeringValue);
+				motorSetPercent(1, 1, steeringValue);
+				return;
+			}
+
+			if (throttleValue > throttleMidpoint-throttleThreshold && throttleValue < throttleMidpoint+throttleThreshold) {
+
+				console.log("setThrottle stop "+throttleValue);
+				motorSetPercent(1, 0, 0);
+				motorSetPercent(2, 0, 0);
+
+			} else {
+
+				//calc steering offset
+
+				if (throttleValue >= 500) {
+					//forward
+					throttleValue = (throttleValue - 500) / 500;
+
+					console.log("setThrottle fwd throttleValue = "+throttleValue );
+
+					motorSetPercent(1, 1, throttleValue);
+					motorSetPercent(2, 1, throttleValue);
+
+				} else {
+					//reverse
+					throttleValue = (500 - throttleValue) / 500;
+
+					console.log("setThrottle rev throttleValue = "+throttleValue );
+
+					motorSetPercent(1, -1, throttleValue);
+					motorSetPercent(2, -1, throttleValue);
+				}
+			}
+
+			break;
+		case "setTilt":
+			if(!messageJson.hasOwnProperty('value')){
+				console.log('invalid json message, missing value');
+				return;
+			}
+			var servoPercent = messageJson.value / 1000;
+
+			var servoValue = ServoRange * servoPercent + ServoMin;
+
+			console.log('tilt pwm = '+servoValue);
+			pwm.setPulseLength(pwmTiltChannel, servoValue);
+			break;
+		case "setPan":
+			if(!messageJson.hasOwnProperty('value')){
+				console.log('invalid json message, missing value');
+				return;
+			}
+			var servoPercent = messageJson.value / 1000;
+
+			var servoValue = ServoRange * servoPercent + ServoMin;
+
+			console.log('pan pwm = '+servoValue);
+			pwm.setPulseLength(pwmPanChannel, servoValue);
+			break;
+		default:
+			console.log("invalid action!");
+			return;
+	}
 };
 
 
