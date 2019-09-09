@@ -10,9 +10,12 @@ const url = require('url');
 const fs = require('fs');
 const path = require('path');
 const querystring = require('querystring');
+const { spawn } = require('child_process');
 
 const httpPort = 8080;
 const httpVideoStreamKey = 'supersecret';
+var videoRunning = false;
+var videoFfmpegProcess = null;
 
 // PCA9685 options
 var options = {
@@ -101,8 +104,7 @@ webSocketServer.on('connection', function connection(ws, req) {
 
 	const ip = req.connection.remoteAddress;
 	console.log('connection from ' + ip);
-
-	ws.on('message', function incoming(message) {
+	ws.on('message', function(message){
 		console.log('received: %s', message);
 		
 		let messageJson;
@@ -118,6 +120,16 @@ webSocketServer.on('connection', function connection(ws, req) {
 			return;
 		}
 		switch(messageJson.action){
+			case "stopVideo":
+				stopVideoProcess();
+				break;
+			case "startVideo":
+				startVideoProcess();
+				break;
+			case "readVideoRunning":
+				ws.send('{"msgType":"videoRunning","running":'+(videoRunning?1:0)+'}');
+
+				break;
 			case "setShoot":
 				if(!messageJson.hasOwnProperty('value')){
 					console.log('invalid json message, missing value');
@@ -231,13 +243,21 @@ webSocketServer.on('connection', function connection(ws, req) {
 				return;
 		}
 	});
+	// ws.on('message', function(message){
+	// 	handleIncomingControlMessage(ws, message);
+	// });
 
 	ws.on('close', function clear() {
 		console.log('connection closed for ' + ip);
 	});
 
-	ws.send('{"connected":1}');
+	ws.send('{"connected":true}');
 });
+
+function handleIncomingControlMessage(ws, message) {
+
+};
+
 
 const videoServer = new WebSocket.Server({ noServer: true });
 videoServer.on('connection', function(socket, upgradeReq) {
@@ -263,6 +283,80 @@ function broadcastVideoData(data) {
 		}
 	});
 };
+
+function stopVideoProcess(){
+	if(videoFfmpegProcess !== null){
+		videoFfmpegProcess.kill();
+	}
+}
+function startVideoProcess(){
+	if(videoRunning){
+		console.log('startVideo() - Video already running - not starting');
+		return;
+	}
+	console.log('startVideo() - launching ffmpeg');
+
+
+	// $ v4l2-ctl --list-devices
+	// bcm2835-codec (platform:bcm2835-codec):
+	// 		/dev/video10
+	// 		/dev/video11
+	// 		/dev/video12
+	
+	// HD Pro Webcam C920 (usb-3f980000.usb-1.1.3):
+	// 		/dev/video0
+	// 		/dev/video1
+	
+
+	// $ ffmpeg -f v4l2 -list_formats all -i /dev/video0
+	// ffmpeg version 3.2.14-1~deb9u1+rpt1 Copyright (c) 2000-2019 the FFmpeg developers
+	//   built with gcc 6.3.0 (Raspbian 6.3.0-18+rpi1+deb9u1) 20170516
+	//   configuration: --prefix=/usr --extra-version='1~deb9u1+rpt1' --toolchain=hardened --libdir=/usr/lib/arm-linux-gnueabihf --incdir=/usr/include/arm-linux-gnueabihf --enable-gpl --disable-stripping --enable-avresample --enable-avisynth --enable-gnutls --enable-ladspa --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libebur128 --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libmp3lame --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libssh --enable-libtheora --enable-libtwolame --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx265 --enable-libxvid --enable-libzmq --enable-libzvbi --enable-omx --enable-omx-rpi --enable-mmal --enable-openal --enable-opengl --enable-sdl2 --enable-libdc1394 --enable-libiec61883 --arch=armhf --enable-chromaprint --enable-frei0r --enable-libopencv --enable-libx264 --enable-shared
+	//   libavutil      55. 34.101 / 55. 34.101
+	//   libavcodec     57. 64.101 / 57. 64.101
+	//   libavformat    57. 56.101 / 57. 56.101
+	//   libavdevice    57.  1.100 / 57.  1.100
+	//   libavfilter     6. 65.100 /  6. 65.100
+	//   libavresample   3.  1.  0 /  3.  1.  0
+	//   libswscale      4.  2.100 /  4.  2.100
+	//   libswresample   2.  3.100 /  2.  3.100
+	//   libpostproc    54.  1.100 / 54.  1.100
+	// [video4linux2,v4l2 @ 0x20485c0] Raw       :     yuyv422 :           YUYV 4:2:2 : 640x480 160x90 160x120 176x144 320x180 320x240 352x288 432x240 640x360 800x448 800x600 864x480 960x720 1024x576 1280x720 1600x896 1920x1080 2304x1296 2304x1536
+	// [video4linux2,v4l2 @ 0x20485c0] Compressed:        h264 :                H.264 : 640x480 160x90 160x120 176x144 320x180 320x240 352x288 432x240 640x360 800x448 800x600 864x480 960x720 1024x576 1280x720 1600x896 1920x1080
+	// [video4linux2,v4l2 @ 0x20485c0] Compressed:       mjpeg :          Motion-JPEG : 640x480 160x90 160x120 176x144 320x180 320x240 352x288 432x240 640x360 800x448 800x600 864x480 960x720 1024x576 1280x720 1600x896 1920x1080
+
+	
+	videoFfmpegProcess = spawn('ffmpeg', [
+		'-f', 'v4l2', 
+		//'-threads', '4', 
+		//'-framerate','20',
+		'-video_size','800x448', // '800x448' good, '1280x720' fails, '960x720' fails
+		'-i','/dev/video0',
+		'-f','mpegts',
+		'-framerate','15',
+		'-codec:v','mpeg1video',
+		'-b:v','1800k',
+		'-bf','0',
+		'-muxdelay','0.001',
+		'http://127.0.0.1:8080/sendVideo/?streamKey=supersecret'
+	]);
+	videoRunning = true;
+	
+	videoFfmpegProcess.on('exit', (code) => {
+		console.log('startVideo() - ffmpeg process exited');
+		videoRunning = false;
+		videoFfmpegProcess = null;
+	});
+
+	videoFfmpegProcess.stdout.on('data', (data) => {
+	  console.log(data.toString());
+	});
+	
+	videoFfmpegProcess.stderr.on('data', (data) => {
+	  console.error(data.toString());
+	});
+	
+}
 
 // maps file extention to MIME types
 const mimeType = {
