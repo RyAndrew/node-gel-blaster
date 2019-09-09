@@ -9,8 +9,10 @@ const http = require('http');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
+const querystring = require('querystring');
 
 const httpPort = 8080;
+const httpVideoStreamKey = 'supersecret';
 
 // PCA9685 options
 var options = {
@@ -93,7 +95,6 @@ function motorSetPercent(motorNo, direction, throttlePercent){
 		pwm.setDutyCycle(pinPwm, throttlePercent);
 	}
 }
-
 const webSocketServer = new WebSocket.Server({ noServer: true });
 
 webSocketServer.on('connection', function connection(ws, req) {
@@ -238,6 +239,30 @@ webSocketServer.on('connection', function connection(ws, req) {
 	ws.send('{"connected":1}');
 });
 
+const videoServer = new WebSocket.Server({ noServer: true });
+videoServer.on('connection', function(socket, upgradeReq) {
+	videoServer.connectionCount++;
+	console.log(
+		'New Video Viewer Connection: ', 
+		(upgradeReq || socket.upgradeReq).socket.remoteAddress,
+		(upgradeReq || socket.upgradeReq).headers['user-agent'],
+		'('+videoServer.connectionCount+' total)'
+	);
+	socket.on('close', function(code, message){
+		videoServer.connectionCount--;
+		console.log(
+			'Disconnected WebSocket ('+videoServer.connectionCount+' total)'
+		);
+	});
+});
+
+function broadcastVideoData(data) {
+	videoServer.clients.forEach(function each(clientSocket) {
+		if (clientSocket.readyState === WebSocket.OPEN) {
+			clientSocket.send(data);
+		}
+	});
+};
 
 // maps file extention to MIME types
 const mimeType = {
@@ -257,11 +282,56 @@ const mimeType = {
 	'.ttf': 'aplication/font-sfnt'
 };
 
+var videoClients = [];
+
 const httpServer = http.createServer(function (req, res) {
 	console.log(`${req.method} ${req.url}`);
 
 	// parse URL
 	const parsedUrl = url.parse(req.url);
+	console.log(`parsedUrl.pathname = ${parsedUrl.pathname}`);
+
+	// if(parsedUrl.pathname == '/viewVideo'){
+	// 	const parsedUrl = url.parse(req.url);
+	// 	console.log(log.query);
+		
+	// 	return;
+	// }
+	if(parsedUrl.pathname.indexOf('/sendVideo') != -1){
+
+		var error = true, errorDescription = 'missing streamKey parameter';
+
+		if(parsedUrl.query !== null ){
+			var parsedQuery = querystring.parse(parsedUrl.query);
+
+			if( parsedQuery.streamKey && parsedQuery.streamKey === httpVideoStreamKey){
+				error = false;
+			}else{
+				errorDescription = 'wrong streamKey parameter';
+			}
+		}
+		if(error === true){
+			console.log(`Failed Stream Connection: ${req.socket.remoteAddress}:${req.socket.remotePort} ${errorDescription}`);
+			res.end();
+			return;
+		}
+	
+		res.connection.setTimeout(0);
+		console.log(
+			'Incoming Video Stream Connected: ' + 
+			req.socket.remoteAddress + ':' +
+			req.socket.remotePort
+		);
+		req.on('data', function(data){
+			broadcastVideoData(data);
+		});
+		req.on('end',function(){
+			console.log('closed client');
+		});
+
+		return;
+	}
+
 
 	// extract URL path
 	// Avoid https://en.wikipedia.org/wiki/Directory_traversal_attack
@@ -305,12 +375,19 @@ const httpServer = http.createServer(function (req, res) {
 httpServer.on('upgrade', function upgrade(request, socket, head) {
 	const pathname = url.parse(request.url).pathname;
 
-	if (pathname === '/wsapi') {
-		webSocketServer.handleUpgrade(request, socket, head, function done(ws) {
-			webSocketServer.emit('connection', ws, request);
-		});
-	} else {
-		socket.destroy();
+	switch(pathname){
+		case '/wsapi': 
+			webSocketServer.handleUpgrade(request, socket, head, function done(ws) {
+				webSocketServer.emit('connection', ws, request);
+			});
+			break;
+		case '/viewVideo': 
+			videoServer.handleUpgrade(request, socket, head, function done(ws) {
+				videoServer.emit('connection', ws, request);
+			});
+			break;
+		default:
+			socket.destroy();
 	}
 });
 
