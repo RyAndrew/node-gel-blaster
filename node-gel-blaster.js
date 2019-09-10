@@ -325,15 +325,24 @@ function startVideoProcess(){
 
 	
 	videoFfmpegProcess = spawn('ffmpeg', [
-		'-f', 'v4l2', 
+		//input video
+		'-f', 'v4l2', //video4linux2
 		//'-threads', '4', 
 		//'-framerate','20',
 		'-video_size','800x448', // '800x448' good, '1280x720' fails, '960x720' fails
 		'-i','/dev/video0',
-		'-f','mpegts',
+		//input audio
+		'-f','alsa', //alsa audio
+		'-i','hw:1', //audio device
+		'-ar','44100', //audio sample rate
+		'-c','2', //audio channels
+		//output
+		'-f','mpegts', //output codec format
 		'-framerate','15',
 		'-codec:v','mpeg1video',
 		'-b:v','1800k',
+		'-codec:a', 'mp2',
+		'-b:a','128k',
 		'-bf','0',
 		'-muxdelay','0.001',
 		'http://127.0.0.1:8080/sendVideo/?streamKey=supersecret'
