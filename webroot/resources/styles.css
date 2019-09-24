@@ -11,3 +11,17 @@
     font-size: 20px;
     font-weight: bold;
 }
+
+.video-parent div.x-innerhtml {
+    height:100%;
+    display: flex;
+    justify-content: center;
+/*
+    align-items: center;
+    overflow: hidden;
+*/
+}
+
+.video-parent .video{
+    height:90%;
+}

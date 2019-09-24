@@ -14,14 +14,15 @@
  */
 
 Ext.define('GelBlaster.view.GelBlasterPanel', {
-    extend: 'Ext.form.Panel',
+    extend: 'Ext.tab.Panel',
     alias: 'widget.gelblasterpanel',
 
     requires: [
         'GelBlaster.view.GelBlasterPanelViewModel',
+        'Ext.Panel',
+        'Ext.Button',
         'Ext.field.Slider',
         'Ext.field.Number',
-        'Ext.Button',
         'Ext.chart.CartesianChart',
         'Ext.chart.axis.Numeric',
         'Ext.chart.series.Line'
@@ -31,615 +32,740 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         type: 'gelblasterpanel'
     },
     fullscreen: true,
-    title: 'Gel Blaster',
     defaultListenerScope: true,
 
     items: [
         {
-            xtype: 'container',
-            itemId: 'steering',
+            xtype: 'panel',
+            title: 'Controls',
             items: [
                 {
                     xtype: 'container',
-                    userCls: 'steering-label',
-                    margin: 5,
-                    layout: 'hbox',
+                    itemId: 'steering',
                     items: [
                         {
-                            xtype: 'container',
-                            html: 'Left',
-                            margin: '0 0 0 60'
-                        },
-                        {
-                            xtype: 'container',
-                            flex: 1
-                        },
-                        {
-                            xtype: 'container',
-                            html: 'Right'
-                        }
-                    ]
-                },
-                {
-                    xtype: 'sliderfield',
-                    bind: '{steeringSetValue}',
-                    itemId: 'steeringSetPointSlider',
-                    name: 'steeringSlider',
-                    margin: '0 10 5 10',
-                    label: 'Steer',
-                    labelWidth: 65,
-                    value: 500,
-                    liveUpdate: true,
-                    maxValue: 1000
-                }
-            ]
-        },
-        {
-            xtype: 'container',
-            itemId: 'throttle',
-            items: [
-                {
-                    xtype: 'container',
-                    userCls: 'steering-label',
-                    margin: 5,
-                    layout: 'hbox',
-                    items: [
-                        {
-                            xtype: 'container',
-                            html: 'Reverse',
-                            margin: '0 0 0 60'
-                        },
-                        {
-                            xtype: 'container',
-                            flex: 1
-                        },
-                        {
-                            xtype: 'container',
-                            html: 'Forward'
-                        }
-                    ]
-                },
-                {
-                    xtype: 'sliderfield',
-                    bind: '{throttleSetValue}',
-                    itemId: 'throttleSlider',
-                    name: 'throttleSlider',
-                    margin: '0 10 5 10',
-                    label: 'Throttle',
-                    labelWidth: 65,
-                    value: 50,
-                    liveUpdate: true,
-                    maxValue: 1000
-                }
-            ]
-        },
-        {
-            xtype: 'container',
-            itemId: 't-rex pan',
-            items: [
-                {
-                    xtype: 'container',
-                    userCls: 'steering-label',
-                    margin: 5,
-                    layout: 'hbox',
-                    items: [
-                        {
-                            xtype: 'container',
-                            html: 'Left',
-                            margin: '0 0 0 60'
-                        },
-                        {
-                            xtype: 'container',
-                            flex: 1
-                        },
-                        {
-                            xtype: 'container',
-                            html: 'Right'
-                        }
-                    ]
-                },
-                {
-                    xtype: 'sliderfield',
-                    bind: '{trexPanSetValue}',
-                    itemId: 'trexPanSlider',
-                    name: 'trexPanSlider',
-                    margin: '0 10 5 10',
-                    label: 'Pan',
-                    labelWidth: 68,
-                    value: 500,
-                    liveUpdate: true,
-                    maxValue: 1000,
-                    listeners: {
-                        change: 'onTrexPanSliderChange'
-                    }
-                }
-            ]
-        },
-        {
-            xtype: 'container',
-            itemId: 't-rex tilt',
-            items: [
-                {
-                    xtype: 'container',
-                    userCls: 'steering-label',
-                    margin: 5,
-                    layout: 'hbox',
-                    items: [
-                        {
-                            xtype: 'container',
-                            html: 'Down',
-                            margin: '0 0 0 60'
-                        },
-                        {
-                            xtype: 'container',
-                            flex: 1
-                        },
-                        {
-                            xtype: 'container',
-                            html: 'Up'
-                        }
-                    ]
-                },
-                {
-                    xtype: 'sliderfield',
-                    bind: '{trexTiltSetValue}',
-                    itemId: 'trexTiltSlider',
-                    name: 'trexTiltSlider',
-                    margin: '0 10 5 10',
-                    label: 'Tilt',
-                    labelWidth: 65,
-                    value: 500,
-                    liveUpdate: true,
-                    maxValue: 1000,
-                    listeners: {
-                        change: 'onTrexTiltSliderChange'
-                    }
-                }
-            ]
-        },
-        {
-            xtype: 'container',
-            itemId: 't-rex jaw',
-            items: [
-                {
-                    xtype: 'container',
-                    userCls: 'steering-label',
-                    margin: 5,
-                    layout: 'hbox',
-                    items: [
-                        {
-                            xtype: 'container',
-                            html: 'Close',
-                            margin: '0 0 0 60'
-                        },
-                        {
-                            xtype: 'container',
-                            flex: 1
-                        },
-                        {
-                            xtype: 'container',
-                            html: 'Open'
-                        }
-                    ]
-                },
-                {
-                    xtype: 'sliderfield',
-                    bind: '{trexJawSetValue}',
-                    itemId: 'trexJawSlider',
-                    name: 'trexJawSlider',
-                    margin: '0 10 5 10',
-                    label: 'Slider',
-                    labelWidth: 65,
-                    value: 0,
-                    liveUpdate: true,
-                    maxValue: 1000,
-                    listeners: {
-                        change: 'onTrexJawSliderChange'
-                    }
-                }
-            ]
-        },
-        {
-            xtype: 'container',
-            itemId: 'hbox',
-            layout: 'hbox',
-            items: [
-                {
-                    xtype: 'container',
-                    itemId: 'ThrottleHbox',
-                    userCls: 'variable-box',
-                    items: [
-                        {
-                            xtype: 'container',
-                            itemId: 'throttleLabel',
-                            html: 'Throttle',
-                            margin: 10
-                        },
-                        {
-                            xtype: 'numberfield',
-                            bind: '{throttleSetValue}',
-                            itemId: 'throttleText',
-                            width: 100,
-                            margin: 10,
-                            label: 'set',
-                            labelWidth: 35,
-                            value: 0,
-                            clearable: false,
-                            maxValue: 1000,
-                            minValue: 0,
+                            xtype: 'button',
+                            itemId: 'mybutton8',
+                            margin: '10 0 0 10',
+                            text: 'Virtual Controller',
                             listeners: {
-                                change: 'onThrottleTextChange'
+                                tap: 'onMybutton8Tap'
                             }
                         },
                         {
                             xtype: 'container',
-                            itemId: 'shootLabel',
-                            html: 'Shoot',
-                            margin: 10
+                            userCls: 'steering-label',
+                            margin: 5,
+                            layout: 'hbox',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    html: 'Left',
+                                    margin: '0 0 0 60'
+                                },
+                                {
+                                    xtype: 'container',
+                                    flex: 1
+                                },
+                                {
+                                    xtype: 'container',
+                                    html: 'Right'
+                                }
+                            ]
                         },
                         {
-                            xtype: 'numberfield',
-                            itemId: 'shootText',
-                            width: 100,
-                            margin: 10,
-                            label: 'set',
-                            labelWidth: 35,
-                            value: 0,
-                            clearable: false,
-                            maxValue: 1000,
-                            minValue: 0,
-                            listeners: {
-                                change: 'onShootTextChange'
-                            }
-                        }
-                    ]
-                },
-                {
-                    xtype: 'container',
-                    itemId: 'setPointHbox',
-                    userCls: 'variable-box',
-                    items: [
-                        {
-                            xtype: 'container',
-                            itemId: 'setPointActualLabel',
-                            html: 'Steer Set & Actual',
-                            margin: 10
-                        },
-                        {
-                            xtype: 'numberfield',
+                            xtype: 'sliderfield',
                             bind: '{steeringSetValue}',
-                            itemId: 'steeringSetPointText',
-                            width: 120,
-                            margin: 10,
-                            label: 'set point',
-                            labelWidth: 70,
+                            itemId: 'steeringSetPointSlider',
+                            name: 'steeringSlider',
+                            margin: '0 10 5 10',
+                            label: 'Steer',
+                            labelWidth: 65,
+                            value: 500,
+                            liveUpdate: true,
+                            maxValue: 1000
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
+                    itemId: 'throttle',
+                    items: [
+                        {
+                            xtype: 'container',
+                            userCls: 'steering-label',
+                            margin: 5,
+                            layout: 'hbox',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    html: 'Reverse',
+                                    margin: '0 0 0 60'
+                                },
+                                {
+                                    xtype: 'container',
+                                    flex: 1
+                                },
+                                {
+                                    xtype: 'container',
+                                    html: 'Forward'
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'sliderfield',
+                            bind: '{throttleSetValue}',
+                            itemId: 'throttleSlider',
+                            name: 'throttleSlider',
+                            margin: '0 10 5 10',
+                            label: 'Throttle',
+                            labelWidth: 65,
                             value: 50,
-                            clearable: false,
+                            liveUpdate: true,
+                            maxValue: 1000
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
+                    itemId: 't-rex pan',
+                    items: [
+                        {
+                            xtype: 'container',
+                            userCls: 'steering-label',
+                            margin: 5,
+                            layout: 'hbox',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    html: 'Left',
+                                    margin: '0 0 0 60'
+                                },
+                                {
+                                    xtype: 'container',
+                                    flex: 1
+                                },
+                                {
+                                    xtype: 'container',
+                                    html: 'Right'
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'sliderfield',
+                            bind: '{trexPanSetValue}',
+                            itemId: 'trexPanSlider',
+                            name: 'trexPanSlider',
+                            margin: '0 10 5 10',
+                            label: 'Pan',
+                            labelWidth: 68,
+                            value: 500,
+                            liveUpdate: true,
                             maxValue: 1000,
-                            minValue: 0,
                             listeners: {
-                                change: 'onSteeringSetPointTextChange'
+                                change: 'onTrexPanSliderChange'
                             }
-                        },
-                        {
-                            xtype: 'textfield',
-                            itemId: 'steeringCurrent',
-                            width: 120,
-                            margin: 10,
-                            label: 'current',
-                            labelWidth: 70,
-                            value: 0,
-                            clearable: false
-                        },
-                        {
-                            xtype: 'textfield',
-                            itemId: 'pidError',
-                            width: 120,
-                            margin: 10,
-                            label: 'error',
-                            labelWidth: 70,
-                            value: 0,
-                            clearable: false
                         }
                     ]
                 },
                 {
                     xtype: 'container',
-                    itemId: 'pidHbox',
-                    userCls: 'variable-box',
+                    itemId: 't-rex tilt',
                     items: [
                         {
                             xtype: 'container',
-                            itemId: 'pidVariablesLabel',
-                            html: 'PID Constants',
-                            margin: 10
+                            userCls: 'steering-label',
+                            margin: 5,
+                            layout: 'hbox',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    html: 'Down',
+                                    margin: '0 0 0 60'
+                                },
+                                {
+                                    xtype: 'container',
+                                    flex: 1
+                                },
+                                {
+                                    xtype: 'container',
+                                    html: 'Up'
+                                }
+                            ]
                         },
                         {
-                            xtype: 'numberfield',
-                            itemId: 'pidConstantP',
-                            width: 80,
-                            margin: 10,
-                            label: 'P',
-                            labelWidth: 25,
-                            value: 0,
-                            clearable: false,
-                            decimals: 3
-                        },
-                        {
-                            xtype: 'numberfield',
-                            itemId: 'pidConstantI',
-                            width: 80,
-                            margin: 10,
-                            label: 'I',
-                            labelWidth: 25,
-                            value: 0,
-                            clearable: false,
-                            decimals: 3
-                        },
-                        {
-                            xtype: 'numberfield',
-                            itemId: 'pidConstantD',
-                            width: 80,
-                            margin: '10 10 0 10',
-                            label: 'D',
-                            labelWidth: 25,
-                            value: 0,
-                            clearable: false,
-                            decimals: 3
-                        },
-                        {
-                            xtype: 'button',
-                            itemId: 'updatePidConstants',
-                            margin: '10 10 10 30',
-                            text: 'Update',
+                            xtype: 'sliderfield',
+                            bind: '{trexTiltSetValue}',
+                            itemId: 'trexTiltSlider',
+                            name: 'trexTiltSlider',
+                            margin: '0 10 5 10',
+                            label: 'Tilt',
+                            labelWidth: 65,
+                            value: 500,
+                            liveUpdate: true,
+                            maxValue: 1000,
                             listeners: {
-                                tap: 'onMybutton1Tap'
+                                change: 'onTrexTiltSliderChange'
                             }
                         }
                     ]
                 },
                 {
                     xtype: 'container',
-                    itemId: 'buttonsHbox',
-                    userCls: 'variable-box',
+                    itemId: 't-rex jaw',
+                    items: [
+                        {
+                            xtype: 'container',
+                            userCls: 'steering-label',
+                            margin: 5,
+                            layout: 'hbox',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    html: 'Close',
+                                    margin: '0 0 0 60'
+                                },
+                                {
+                                    xtype: 'container',
+                                    flex: 1
+                                },
+                                {
+                                    xtype: 'container',
+                                    html: 'Open'
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'sliderfield',
+                            bind: '{trexJawSetValue}',
+                            itemId: 'trexJawSlider',
+                            name: 'trexJawSlider',
+                            margin: '0 10 5 10',
+                            label: 'Slider',
+                            labelWidth: 65,
+                            value: 0,
+                            liveUpdate: true,
+                            maxValue: 1000,
+                            listeners: {
+                                change: 'onTrexJawSliderChange'
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
+                    itemId: 'hbox',
+                    layout: 'hbox',
+                    items: [
+                        {
+                            xtype: 'container',
+                            itemId: 'ThrottleHbox',
+                            userCls: 'variable-box',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'throttleLabel',
+                                    html: 'Throttle',
+                                    margin: 10
+                                },
+                                {
+                                    xtype: 'numberfield',
+                                    bind: '{throttleSetValue}',
+                                    itemId: 'throttleText',
+                                    width: 100,
+                                    margin: 10,
+                                    label: 'set',
+                                    labelWidth: 35,
+                                    value: 0,
+                                    clearable: false,
+                                    maxValue: 1000,
+                                    minValue: 0,
+                                    listeners: {
+                                        change: 'onThrottleTextChange'
+                                    }
+                                },
+                                {
+                                    xtype: 'container',
+                                    itemId: 'shootLabel',
+                                    html: 'Shoot',
+                                    margin: 10
+                                },
+                                {
+                                    xtype: 'numberfield',
+                                    itemId: 'shootText',
+                                    width: 100,
+                                    margin: 10,
+                                    label: 'set',
+                                    labelWidth: 35,
+                                    value: 0,
+                                    clearable: false,
+                                    maxValue: 1000,
+                                    minValue: 0,
+                                    listeners: {
+                                        change: 'onShootTextChange'
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'container',
+                            itemId: 'setPointHbox',
+                            userCls: 'variable-box',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'setPointActualLabel',
+                                    html: 'Steer Set & Actual',
+                                    margin: 10
+                                },
+                                {
+                                    xtype: 'numberfield',
+                                    bind: '{steeringSetValue}',
+                                    itemId: 'steeringSetPointText',
+                                    width: 120,
+                                    margin: 10,
+                                    label: 'set point',
+                                    labelWidth: 70,
+                                    value: 50,
+                                    clearable: false,
+                                    maxValue: 1000,
+                                    minValue: 0,
+                                    listeners: {
+                                        change: 'onSteeringSetPointTextChange'
+                                    }
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    itemId: 'steeringCurrent',
+                                    width: 120,
+                                    margin: 10,
+                                    label: 'current',
+                                    labelWidth: 70,
+                                    value: 0,
+                                    clearable: false
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    itemId: 'pidError',
+                                    width: 120,
+                                    margin: 10,
+                                    label: 'error',
+                                    labelWidth: 70,
+                                    value: 0,
+                                    clearable: false
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'container',
+                            itemId: 'pidHbox',
+                            userCls: 'variable-box',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'pidVariablesLabel',
+                                    html: 'PID Constants',
+                                    margin: 10
+                                },
+                                {
+                                    xtype: 'numberfield',
+                                    itemId: 'pidConstantP',
+                                    width: 80,
+                                    margin: 10,
+                                    label: 'P',
+                                    labelWidth: 25,
+                                    value: 0,
+                                    clearable: false,
+                                    decimals: 3
+                                },
+                                {
+                                    xtype: 'numberfield',
+                                    itemId: 'pidConstantI',
+                                    width: 80,
+                                    margin: 10,
+                                    label: 'I',
+                                    labelWidth: 25,
+                                    value: 0,
+                                    clearable: false,
+                                    decimals: 3
+                                },
+                                {
+                                    xtype: 'numberfield',
+                                    itemId: 'pidConstantD',
+                                    width: 80,
+                                    margin: '10 10 0 10',
+                                    label: 'D',
+                                    labelWidth: 25,
+                                    value: 0,
+                                    clearable: false,
+                                    decimals: 3
+                                },
+                                {
+                                    xtype: 'button',
+                                    itemId: 'updatePidConstants',
+                                    margin: '10 10 10 30',
+                                    text: 'Update',
+                                    listeners: {
+                                        tap: 'onMybutton1Tap'
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'container',
+                            itemId: 'buttonsHbox',
+                            userCls: 'variable-box',
+                            layout: 'vbox',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'buttonsLabel',
+                                    html: 'Control',
+                                    margin: 10
+                                },
+                                {
+                                    xtype: 'button',
+                                    margin: '0 20 5 20',
+                                    text: 'Stop Steering',
+                                    listeners: {
+                                        tap: 'onMybuttonTap'
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    margin: '5 20 5 20',
+                                    text: 'Stop Throttle',
+                                    listeners: {
+                                        tap: 'onMybuttonTap2'
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    margin: '5 20 5 20',
+                                    text: 'Stop Steer Loop',
+                                    listeners: {
+                                        tap: 'onMybuttonTap1'
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    margin: '5 20 5 20',
+                                    text: 'Start Steer Loop',
+                                    listeners: {
+                                        tap: 'onMybuttonTap11'
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'container',
+                            itemId: 'gamepadHbox',
+                            userCls: 'variable-box',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'gamepadLabel',
+                                    html: 'Gamepad',
+                                    margin: 10
+                                },
+                                {
+                                    xtype: 'container',
+                                    margin: '0 0 10 0',
+                                    layout: {
+                                        type: 'hbox',
+                                        align: 'start'
+                                    },
+                                    items: [
+                                        {
+                                            xtype: 'textfield',
+                                            clearIcon: false,
+                                            itemId: 'gamepadRightX',
+                                            width: 95,
+                                            margin: '0 0 0 2',
+                                            label: 'R X',
+                                            labelWidth: 28,
+                                            clearable: false
+                                        },
+                                        {
+                                            xtype: 'textfield',
+                                            clearIcon: false,
+                                            itemId: 'gamepadRightY',
+                                            width: 85,
+                                            margin: '0 2 0 2',
+                                            label: 'Y',
+                                            labelWidth: 16,
+                                            clearable: false
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'container',
+                                    layout: {
+                                        type: 'hbox',
+                                        align: 'start'
+                                    },
+                                    items: [
+                                        {
+                                            xtype: 'textfield',
+                                            clearIcon: false,
+                                            itemId: 'gamepadLeftX',
+                                            width: 95,
+                                            margin: '0 0 0 2',
+                                            label: 'L X',
+                                            labelWidth: 28,
+                                            clearable: false
+                                        },
+                                        {
+                                            xtype: 'textfield',
+                                            clearIcon: false,
+                                            itemId: 'gamepadLeftY',
+                                            width: 85,
+                                            margin: '0 2 0 2',
+                                            label: 'Y',
+                                            labelWidth: 16,
+                                            clearable: false
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'numberfield',
+                                    itemId: 'gamepadFwd',
+                                    width: 120,
+                                    margin: 10,
+                                    label: 'Tr',
+                                    labelWidth: 40,
+                                    clearable: false,
+                                    maxValue: 100,
+                                    minValue: 0
+                                },
+                                {
+                                    xtype: 'numberfield',
+                                    itemId: 'gamepadRev',
+                                    width: 120,
+                                    margin: 10,
+                                    label: 'Tl',
+                                    labelWidth: 40,
+                                    clearable: false,
+                                    maxValue: 100,
+                                    minValue: 0
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'container',
+                            itemId: 'buttonsHbox1',
+                            userCls: 'variable-box',
+                            layout: 'vbox',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'soundButtonsLabel',
+                                    html: 'Sounds',
+                                    margin: 10
+                                },
+                                {
+                                    xtype: 'button',
+                                    margin: '0 20 5 20',
+                                    text: 'X: T Rex',
+                                    listeners: {
+                                        tap: 'onMybuttonTap3'
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    margin: '5 20 5 20',
+                                    text: 'Y: Next Sound',
+                                    listeners: {
+                                        tap: 'onMybuttonTap21'
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'container',
+                            itemId: 'serialCommandHbox',
+                            userCls: 'variable-box',
+                            layout: 'vbox',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'serialCommandsLabel',
+                                    html: 'Arduino Command',
+                                    margin: 10
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    itemId: 'arduinoCommand',
+                                    width: 120,
+                                    margin: 10,
+                                    clearable: false
+                                },
+                                {
+                                    xtype: 'button',
+                                    margin: '0 20 5 20',
+                                    text: 'Send',
+                                    listeners: {
+                                        tap: 'onMybuttonTap31'
+                                    }
+                                },
+                                {
+                                    xtype: 'container',
+                                    html: '<u>LEDS:</u><BR>1-4 solid colors<BR>5-8 blik<BR><u>Text</u><BR>t1Hello World<BR>&nbsp;&nbsp;&nbsp;on line 1 show Hello World'
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
+                    itemId: 'debugOutputLabel',
+                    html: 'Debug Output',
+                    margin: 10
+                },
+                {
+                    xtype: 'cartesian',
+                    height: 250,
+                    hidden: false,
+                    itemId: 'steeringChart',
+                    animation: false,
+                    colors: [
+                        '#115fa6',
+                        '#94ae0a',
+                        '#a61120',
+                        '#ff8809',
+                        '#ffd13e',
+                        '#a61187',
+                        '#24ad9a',
+                        '#7c7474',
+                        '#a66111'
+                    ],
+                    bind: {
+                        store: '{steeringChartStore}'
+                    },
+                    axes: [
+                        {
+                            type: 'numeric',
+                            grid: {
+                                odd: {
+                                    fill: '#e8e8e8'
+                                }
+                            },
+                            maximum: 1100,
+                            minimum: -100,
+                            position: 'left',
+                            title: 'Position'
+                        }
+                    ],
+                    series: [
+                        {
+                            type: 'line',
+                            colors: [
+                                'rgba(200,0,0,0.3)'
+                            ],
+                            style: {
+                                stroke: 'rgb(200,0,0)',
+                                step: true
+                            },
+                            xField: 'x',
+                            yField: 'steeringCurrent'
+                        },
+                        {
+                            type: 'line',
+                            colors: [
+                                'rgba(0,200,0,0.3)'
+                            ],
+                            style: {
+                                stroke: 'rgb(0,200,0)',
+                                step: true
+                            },
+                            xField: 'x',
+                            yField: 'steeringTargetPoint'
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
+                    height: 240,
+                    itemId: 'debugOutputContainerOuter',
+                    userCls: 'debugOutputContainer',
+                    margin: 10,
+                    scrollable: 'vertical',
                     layout: 'vbox',
                     items: [
                         {
                             xtype: 'container',
-                            itemId: 'buttonsLabel',
-                            html: 'Control',
-                            margin: 10
-                        },
-                        {
-                            xtype: 'button',
-                            margin: '0 20 5 20',
-                            text: 'Stop Steering',
-                            listeners: {
-                                tap: 'onMybuttonTap'
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            margin: '5 20 5 20',
-                            text: 'Stop Throttle',
-                            listeners: {
-                                tap: 'onMybuttonTap2'
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            margin: '5 20 5 20',
-                            text: 'Stop Steer Loop',
-                            listeners: {
-                                tap: 'onMybuttonTap1'
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            margin: '5 20 5 20',
-                            text: 'Start Steer Loop',
-                            listeners: {
-                                tap: 'onMybuttonTap11'
-                            }
-                        }
-                    ]
-                },
-                {
-                    xtype: 'container',
-                    itemId: 'gamepadHbox',
-                    userCls: 'variable-box',
-                    items: [
-                        {
-                            xtype: 'container',
-                            itemId: 'gamepadLabel',
-                            html: 'Gamepad',
-                            margin: 10
-                        },
-                        {
-                            xtype: 'numberfield',
-                            itemId: 'gamepadRightLeft',
-                            width: 120,
-                            margin: 10,
-                            label: 'R / L',
-                            labelWidth: 40,
-                            clearable: false,
-                            maxValue: 100,
-                            minValue: -2
-                        },
-                        {
-                            xtype: 'numberfield',
-                            itemId: 'gamepadFwd',
-                            width: 120,
-                            margin: 10,
-                            label: 'Tr',
-                            labelWidth: 40,
-                            clearable: false,
-                            maxValue: 100,
-                            minValue: 0
-                        },
-                        {
-                            xtype: 'numberfield',
-                            itemId: 'gamepadRev',
-                            width: 120,
-                            margin: 10,
-                            label: 'Tl',
-                            labelWidth: 40,
-                            clearable: false,
-                            maxValue: 100,
-                            minValue: 0
-                        }
-                    ]
-                },
-                {
-                    xtype: 'container',
-                    itemId: 'buttonsHbox1',
-                    userCls: 'variable-box',
-                    layout: 'vbox',
-                    items: [
-                        {
-                            xtype: 'container',
-                            itemId: 'soundButtonsLabel',
-                            html: 'Sounds',
-                            margin: 10
-                        },
-                        {
-                            xtype: 'button',
-                            margin: '0 20 5 20',
-                            text: 'X: T Rex',
-                            listeners: {
-                                tap: 'onMybuttonTap3'
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            margin: '5 20 5 20',
-                            text: 'Y: Next Sound',
-                            listeners: {
-                                tap: 'onMybuttonTap21'
-                            }
-                        }
-                    ]
-                },
-                {
-                    xtype: 'container',
-                    itemId: 'serialCommandHbox',
-                    userCls: 'variable-box',
-                    layout: 'vbox',
-                    items: [
-                        {
-                            xtype: 'container',
-                            itemId: 'serialCommandsLabel',
-                            html: 'Arduino Command',
-                            margin: 10
-                        },
-                        {
-                            xtype: 'textfield',
-                            itemId: 'arduinoCommand',
-                            width: 120,
-                            margin: 10,
-                            clearable: false
-                        },
-                        {
-                            xtype: 'button',
-                            margin: '0 20 5 20',
-                            text: 'Send',
-                            listeners: {
-                                tap: 'onMybuttonTap31'
-                            }
-                        },
-                        {
-                            xtype: 'container',
-                            html: '<u>LEDS:</u><BR>1-4 solid colors<BR>5-8 blik<BR><u>Text</u><BR>t1Hello World<BR>&nbsp;&nbsp;&nbsp;on line 1 show Hello World'
+                            itemId: 'debugOutputContainer'
                         }
                     ]
                 }
             ]
         },
         {
-            xtype: 'container',
-            itemId: 'debugOutputLabel',
-            html: 'Debug Output',
-            margin: 10
-        },
-        {
-            xtype: 'cartesian',
-            height: 250,
-            hidden: false,
-            itemId: 'steeringChart',
-            animation: false,
-            colors: [
-                '#115fa6',
-                '#94ae0a',
-                '#a61120',
-                '#ff8809',
-                '#ffd13e',
-                '#a61187',
-                '#24ad9a',
-                '#7c7474',
-                '#a66111'
-            ],
-            bind: {
-                store: '{steeringChartStore}'
-            },
-            axes: [
-                {
-                    type: 'numeric',
-                    grid: {
-                        odd: {
-                            fill: '#e8e8e8'
-                        }
-                    },
-                    maximum: 1100,
-                    minimum: -100,
-                    position: 'left',
-                    title: 'Position'
-                }
-            ],
-            series: [
-                {
-                    type: 'line',
-                    colors: [
-                        'rgba(200,0,0,0.3)'
-                    ],
-                    style: {
-                        stroke: 'rgb(200,0,0)',
-                        step: true
-                    },
-                    xField: 'x',
-                    yField: 'steeringCurrent'
-                },
-                {
-                    type: 'line',
-                    colors: [
-                        'rgba(0,200,0,0.3)'
-                    ],
-                    style: {
-                        stroke: 'rgb(0,200,0)',
-                        step: true
-                    },
-                    xField: 'x',
-                    yField: 'steeringTargetPoint'
-                }
-            ]
-        },
-        {
-            xtype: 'container',
-            height: 240,
-            itemId: 'debugOutputContainerOuter',
-            userCls: 'debugOutputContainer',
-            margin: 10,
-            scrollable: 'vertical',
+            xtype: 'panel',
             layout: 'vbox',
+            title: 'Video',
             items: [
                 {
                     xtype: 'container',
-                    itemId: 'debugOutputContainer'
+                    defaults: {
+                        margin: 10
+                    },
+                    layout: 'hbox',
+                    items: [
+                        {
+                            xtype: 'container',
+                            itemId: 'videoStatus',
+                            width: 150,
+                            html: 'Status',
+                            padding: '20 0 0 0'
+                        },
+                        {
+                            xtype: 'button',
+                            height: 60,
+                            itemId: 'btnStart',
+                            width: 200,
+                            text: 'Start Video Process',
+                            listeners: {
+                                tap: 'onMybutton5Tap'
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            height: 60,
+                            itemId: 'btnStop',
+                            width: 200,
+                            text: 'Stop Video Process',
+                            listeners: {
+                                tap: 'onMybutton5Tap2'
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            height: 60,
+                            itemId: 'btnView',
+                            width: 200,
+                            text: 'View Video',
+                            listeners: {
+                                tap: 'onMybutton5Tap1'
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
+                    height: '100%',
+                    userCls: 'video-parent',
+                    html: '<canvas id="video-canvas" class="video"></canvas>'
                 }
             ]
         }
     ],
     listeners: {
         painted: 'onFormpanelPainted'
+    },
+
+    onMybutton8Tap: function(button, e, eOpts) {
+        this.showVirtualController();
     },
 
     onTrexPanSliderChange: function(me, newValue, oldValue, eOpts) {
@@ -678,9 +804,12 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             newValue = newValue[0];
         }
 
+        this.moveX = newValue;
+
         this.socketSend(Ext.encode({
-            action:'setThrottle',
-            value:newValue
+            action:'move',
+            x:this.moveX,
+            y:this.moveY
         }));
     },
 
@@ -699,7 +828,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         if(newValue && newValue.constructor === Array){
             newValue = newValue[0];
         }
-        console.log(newValue);
+
         if(!this.lastSteeringChangeDefered){
             this.lastSteeringChangeDefered = true;
 
@@ -710,7 +839,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             Ext.defer(function(){
                 this.lastSteeringChangeDefered = false;
                 var currentValue = field.getValue();
-        console.log(currentValue);
+
                 if(this.lastSent != currentValue){
                     this.lastSent = currentValue;
                     this.sendUpdateSteering(currentValue);
@@ -782,6 +911,28 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
 
     },
 
+    onMybutton5Tap: function(button, e, eOpts) {
+        this.checkVideoRunning();
+
+        this.socketSend(Ext.encode({
+            action:'startVideo'
+        }));
+    },
+
+    onMybutton5Tap2: function(button, e, eOpts) {
+        this.socketSend(Ext.encode({
+            action:'stopVideo'
+        }));
+    },
+
+    onMybutton5Tap1: function(button, e, eOpts) {
+        if(!this.videoStreamPlayer){
+            var canvas = document.getElementById('video-canvas');
+            var url = 'ws://'+document.location.hostname+':8080/viewVideo';
+            this.videoStreamPlayer = new JSMpeg.Player(url, {canvas: canvas});
+        }
+    },
+
     onFormpanelPainted: function(sender, element, eOpts) {
         this.websocketInit();
         this.gamepadInit();
@@ -790,9 +941,15 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         this.trexPanSlider = this.queryById('trexPanSlider');
         this.trexTiltSlider = this.queryById('trexTiltSlider');
 
-        this.fieldGamepadLeftRight = this.queryById('gamepadRightLeft');
-        this.fieldGamepadFwd = this.queryById('gamepadFwd');
-        this.fieldGamepadRev = this.queryById('gamepadRev');
+        //this.fieldGamepadLeftRight = this.queryById('gamepadRightLeft');
+        //this.fieldGamepadFwd = this.queryById('gamepadFwd');
+        //this.fieldGamepadRev = this.queryById('gamepadRev');
+
+        this.fieldGamepadRightX = this.queryById('gamepadRightX');
+        this.fieldGamepadRightY = this.queryById('gamepadRightY');
+
+        this.fieldGamepadLeftX = this.queryById('gamepadLeftX');
+        this.fieldGamepadLeftY = this.queryById('gamepadLeftY');
 
         this.fieldSteeringSetPointText = this.queryById('steeringSetPointText');
         this.fieldThrottleText = this.queryById('throttleText');
@@ -837,6 +994,8 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         	this.socket.onclose = (function(){
         		this.appendDebugOutput("websocket closed!");
                 this.socket = false;
+
+                Ext.defer(function(){ this.websocketInit(); },500,this);
         	}).bind(this);
 
         	this.socket.onmessage = this.socketReceive.bind(this);
@@ -893,15 +1052,22 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             case 'pidConstants':
                 this.msgUpdatePidConstants(jsonData);
                 break;
+            case 'videoRunning':
+                this.checkVideoRunningResponse(jsonData);
+                break;
         }
 
 
     },
 
     sendUpdateSteering: function(value) {
+        this.moveY = value;
+
         this.socketSend(Ext.encode({
-            action:'setSteering',
-            value:value
+            //action:'setSteering',
+            action:'move',
+            y:this.moveY,
+            x:this.moveX
         }));
     },
 
@@ -971,7 +1137,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
 
             this.appendDebugOutput("Gamepad disconnected at index "+e.gamepad.index+", id "+e.gamepad.id);
 
-            cancelInterval(this.gamePadLoops[e.gamepad.id]['loop'])
+            clearInterval(this.gamePadLoops[e.gamepad.id]['loop']);
     },
 
     gamepadBeginLoop: function(gamepad) {
@@ -999,7 +1165,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             gamepad = gamepadUpdate[gamepad.index];
         }else{
             console.log('gamepad no longer available?');
-            cancelInterval(this.gamePadLoops[e.gamepad.id]['loop']);
+            clearInterval(this.gamePadLoops[e.gamepad.id]['loop']);
             return;
         }
         //console.log(gamepad);
@@ -1023,40 +1189,43 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
 
 
         var leftStickX = gamepad.axes[0] - .08;
-        leftStickX = Math.round((leftStickX * 500) + 500);
-        if(leftStickX !== this.wsLeftStickX ){
-            this.wsLeftStickX = leftStickX;
-            this.fieldSteeringSetPointText.setValue(leftStickX);
+        this.fieldGamepadLeftX.setValue(leftStickX);
+        var leftStickXslider = Math.round((leftStickX * 500) + 500);
+        if(leftStickXslider !== this.wsLeftStickX ){
+            this.wsLeftStickX = leftStickXslider;
+            this.fieldSteeringSetPointText.setValue(leftStickXslider);
         }
 
         var leftStickY = gamepad.axes[1];
-        leftStickY = 1000 - Math.round((leftStickY * 500) + 500);
-        if(leftStickY !== this.wsLeftStickY ){
-            this.wsLeftStickY = leftStickY;
-            this.fieldThrottleText.setValue(leftStickY);
+        this.fieldGamepadLeftY.setValue(leftStickY);
+        var leftStickYslider = 1000 - Math.round((leftStickY * 500) + 500);
+        if(leftStickYslider !== this.wsLeftStickY ){
+            this.wsLeftStickY = leftStickYslider;
+            this.fieldThrottleText.setValue(leftStickYslider);
         }
 
         var rightStickX = gamepad.axes[2];
-        this.fieldGamepadLeftRight.setValue(rightStickX);
-        rightStickX = 1000 - Math.round((rightStickX * 500) + 500);
-        if(rightStickX !== this.wsRightStickX ){
-            this.wsRightStickX = rightStickX;
-            this.trexPanSlider.setValue(rightStickX);
+        this.fieldGamepadRightX.setValue(rightStickX);
+        var rightStickXslider = 1000 - Math.round((rightStickX * 500) + 500);
+        if(rightStickXslider !== this.wsRightStickX ){
+            this.wsRightStickX = rightStickXslider;
+            this.trexPanSlider.setValue(rightStickXslider);
         }
 
 
         var rightStickY = gamepad.axes[3];
-        rightStickY = Math.round((rightStickY * 500) + 500);
-        if(rightStickY !== this.wsRightStickY ){
-            this.wsRightStickY = rightStickY;
-            this.trexTiltSlider.setValue(rightStickY);
+        this.fieldGamepadRightY.setValue(rightStickY);
+        var rightStickYslider = Math.round((rightStickY * 500) + 500);
+        if(rightStickYslider !== this.wsRightStickY ){
+            this.wsRightStickY = rightStickYslider;
+            this.trexTiltSlider.setValue(rightStickYslider);
         }
 
         var triggerRight = gamepad.buttons[7].value;
-        this.fieldGamepadFwd.setValue(triggerRight);
+        //this.fieldGamepadFwd.setValue(triggerRight);
 
         var triggerLeft = gamepad.buttons[6].value;
-        this.fieldGamepadRev.setValue(triggerLeft);
+        //this.fieldGamepadRev.setValue(triggerLeft);
 
 
         if(triggerRight >= 0.8){
@@ -1068,6 +1237,93 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             this.wsTriggerRight = triggerRight;
             this.fieldShootText.setValue(triggerRight);
         }
+
+        if(this.virtualController){
+            var vsRx = rightStickX * 50;
+            var vsRy = rightStickY * 50;
+            var vsLx = leftStickX * 50;
+            var vsLy = leftStickY * 50;
+
+            //console.log(vsRx, vsRy, vsLx, vsLy);
+            this.virtualControllerStickRight.stick.style.transform = `translate3d(${vsRx}px, ${vsRy}px, 0px)`;
+            this.virtualControllerStickLeft.stick.style.transform = `translate3d(${vsLx}px, ${vsLy}px, 0px)`;
+
+            if(triggerRight > 0){
+                this.virtualControllerbuttonFire.classList.add("pressed");
+            }else{
+                this.virtualControllerbuttonFire.classList.remove("pressed");
+            }
+        }
+    },
+
+    showVirtualController: function() {
+        if(!this.virtualController){
+            this.virtualController = Ext.create({
+                xtype:'panel',
+                title:'Virtual Controller',
+                floated:true,
+                userCls:'controller-window',
+                width:500,
+                height:300,
+                x:150,
+                y:100,
+                closable:true,
+                closeAction:'hide',
+                draggable:true,
+                html:'<div class="button-container"><div class="left-buttons">'+
+        		'<div class="stick" id="virctrlstickLeft"></div>'+
+        		'<button class="btn-fire" id="virctrlbuttonFire"></button>'+
+        	'</div>'+
+        	'<div class="right-buttons">'+
+        		'<div class="stick" id="virctrlstickRight"></div>'+
+        	'</div></div>',
+                listeners:{
+                    scope:this,
+                    painted:function(){
+                        console.log(this);
+                        if(!this.buttonsInit){
+                            this.buttonsInit = true;
+                            this.virtualControllerbuttonFire = document.getElementById('virctrlbuttonFire');
+                            createFireButton(this.virtualControllerbuttonFire, function(state){
+                                console.log('fire button!', state);
+                                if(state==='down'){
+                                    this.fieldShootText.setValue(1);
+                                }else if(state==='up'){
+                                    this.fieldShootText.setValue(0);
+                                }
+
+                            }.bind(this));
+                            stickRange = 50;
+                            this.virtualControllerStickRight = createStick(document.getElementById('virctrlstickRight'), stickRange, 'right', function(pos){
+                                console.log('stick move! right ', pos);
+                                this.fieldGamepadRightX.setValue(pos.x);
+                                this.fieldGamepadRightY.setValue(pos.y);
+
+                                var x = 1000 - Math.round(((pos.x/50) * 500) + 500);
+                                var y = Math.round(((pos.y/50) * 500) + 500);
+                                this.trexPanSlider.setValue(x);
+                                this.trexTiltSlider.setValue(y);
+                            }.bind(this));
+                            this.virtualControllerStickLeft = createStick(document.getElementById('virctrlstickLeft'), stickRange, 'left', function(pos){
+                                console.log('stick move! left ', pos);
+
+                                this.fieldGamepadLeftX.setValue(pos.x);
+                                this.fieldGamepadLeftY.setValue(pos.y);
+
+                                var x = Math.round(((pos.x/50) * 500) + 500);
+                                var y = 1000 - Math.round(((pos.y/50) * 500) + 500);
+                                this.fieldSteeringSetPointText.setValue(x);
+                                this.fieldThrottleText.setValue(y);
+                            }.bind(this));
+                        }
+                    }
+                }
+            });
+
+        }
+        console.log(this.virtualController);
+        this.virtualController.show({type:'slide', direction:'right'});
+
     },
 
     clearDebugOutput: function() {
@@ -1087,6 +1343,20 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         // console.log(this.queryById('debugOutputContainerOuter'));
         containerDom = this.queryById('debugOutputContainerOuter').bodyElement.dom;
         containerDom.scrollTop = dom.clientHeight;
+    },
+
+    checkVideoRunning: function() {
+        this.socketSend(Ext.encode({
+            action:'readVideoRunning'
+        }));
+
+        Ext.defer(function(){
+            this.checkVideoRunning();
+        }, 1000, this);
+    },
+
+    checkVideoRunningResponse: function(response) {
+        this.queryById('videoStatus').setHtml('Status: ' + (response.running ? 'Running' : 'Stopped'));
     }
 
 });
