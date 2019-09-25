@@ -14,8 +14,15 @@ const { spawn } = require('child_process');
 
 const httpPort = 8080;
 const httpVideoStreamKey = 'supersecret';
+
+var targetWebsocket = null;
+const targetAddress = '10.88.0.130';
+
+var FfmpegVideoProcess = null;
 var videoRunning = false;
-var videoFfmpegProcess = null;
+
+var FfmpegAudioProcess = null;
+var audioRunning = false;
 
 // PCA9685 options
 var options = {
@@ -132,6 +139,9 @@ function handleIncomingControlMessage(ws, message) {
 		return;
 	}
 	switch(messageJson.action){
+		case "startTargetTimer":
+			targetWebsocketStartTimer();
+			break;
 		case "stopVideo":
 			stopVideoProcess();
 			break;
@@ -256,6 +266,67 @@ function handleIncomingControlMessage(ws, message) {
 	}
 };
 
+function targetWebsocketConnect(afterConnectCb){
+	var afterConnectCallback = afterConnectCb || function(){};
+	if(targetWebsocket !== null){
+		return;
+	}
+	targetWebsocket = new WebSocket('ws://'+targetAddress+'/ws');
+	targetWebsocket.on('open', function() {
+		console.log('Target Websocket Connection Opened to '+targetAddress);
+		afterConnectCallback();
+	});
+	targetWebsocket.on('close', function(code, reason) {
+		console.log('Target Websocket Connection Closed '+code+' '+reason);
+		targetWebsocket = null;
+	});
+	targetWebsocket.on('error', function(error) {
+		console.log('Target Websocket Connection Error ',error);
+	});
+
+	targetWebsocket.on('message', function(message) {
+		console.log('Target Websocket Message:');
+		console.log(message);
+		targetWebsocketMessageRecieved(message);
+	});
+}
+function targetWebsocketMessageRecieved(message){
+	let messageJson;
+	try{
+		messageJson = JSON.parse(message);
+	}catch(err) {
+		console.log('invalid json message');
+		console.log(err);
+		return;
+	}
+	if(!messageJson.cmd){
+		console.log('invalid json message, missing cmd');
+		return;
+	}
+	switch(messageJson.cmd){
+		default:
+			console.log("invalid cmd!");
+			return;
+			break;
+		case 'targetDown':
+	}
+}
+function targetWebsocketSend(msg){
+	if(!targetWebsocket){
+		targetWebsocketConnect(function(){
+			targetWebsocket.send(msg);
+		});
+	}else{
+		targetWebsocket.send(msg);
+	}
+}
+function targetWebsocketStartTimer(){
+	//targetWebsocketSend('{"cmd":"mode","value":"all"}');
+	targetWebsocketSend('{"cmd":"targetUp","value":"all"}');
+	
+	
+
+}
 
 const videoServer = new WebSocket.Server({ noServer: true });
 videoServer.on('connection', function(socket, upgradeReq) {
@@ -283,8 +354,9 @@ function broadcastVideoData(data) {
 };
 
 function stopVideoProcess(){
-	if(videoFfmpegProcess !== null){
-		videoFfmpegProcess.kill();
+	if(FfmpegVideoProcess !== null){
+		FfmpegVideoProcess.kill();
+		FfmpegAudioProcess.kill();
 	}
 }
 function startVideoProcess(){
@@ -324,42 +396,79 @@ function startVideoProcess(){
 	// [video4linux2,v4l2 @ 0x20485c0] Compressed:       mjpeg :          Motion-JPEG : 640x480 160x90 160x120 176x144 320x180 320x240 352x288 432x240 640x360 800x448 800x600 864x480 960x720 1024x576 1280x720 1600x896 1920x1080
 
 	
-	videoFfmpegProcess = spawn('ffmpeg', [
+	// videoFfmpegProcess = spawn('ffmpeg', [
+	// 	//input video
+	// 	'-f', 'v4l2', //video4linux2
+	// 	//'-threads', '4', 
+	// 	//'-framerate','20',
+	// 	'-video_size','800x448', // '800x448' good, '1280x720' fails, '960x720' fails
+	// 	'-i','/dev/video0',
+	// 	//input audio
+	// 	'-f','alsa', //alsa audio
+	// 	'-i','hw:1', //audio device
+	// 	'-ar','44100', //audio sample rate
+	// 	'-c','2', //audio channels
+	// 	//output
+	// 	'-f','mpegts', //output codec format
+	// 	'-framerate','15',
+	// 	'-codec:v','mpeg1video',
+	// 	'-b:v','1800k',
+	// 	'-codec:a', 'mp2',
+	// 	'-b:a','128k',
+	// 	'-bf','0',
+	// 	'-muxdelay','0.001',
+	// 	'http://127.0.0.1:8080/sendVideo/?streamKey=supersecret'
+	// ]);
+
+	FfmpegAudioProcess = spawn('ffmpeg', [
 		//input video
-		'-f', 'v4l2', //video4linux2
-		//'-threads', '4', 
-		//'-framerate','20',
-		'-video_size','800x448', // '800x448' good, '1280x720' fails, '960x720' fails
-		'-i','/dev/video0',
-		//input audio
+		'-vn', //no video
 		'-f','alsa', //alsa audio
 		'-i','hw:1', //audio device
 		'-ar','44100', //audio sample rate
 		'-c','2', //audio channels
 		//output
 		'-f','mpegts', //output codec format
-		'-framerate','15',
-		'-codec:v','mpeg1video',
-		'-b:v','1800k',
 		'-codec:a', 'mp2',
 		'-b:a','128k',
 		'-bf','0',
 		'-muxdelay','0.001',
 		'http://127.0.0.1:8080/sendVideo/?streamKey=supersecret'
 	]);
-	videoRunning = true;
+	audioRunning = true;
 	
-	videoFfmpegProcess.on('exit', (code) => {
-		console.log('startVideo() - ffmpeg process exited');
+	FfmpegAudioProcess.on('exit', (code) => {
+		console.log('startVideo() - ffmpeg AUDIO process exited');
 		videoRunning = false;
-		videoFfmpegProcess = null;
+		FfmpegAudioProcess = null;
 	});
 
-	videoFfmpegProcess.stdout.on('data', (data) => {
+	FfmpegAudioProcess.stdout.on('data', (data) => {
 	  console.log(data.toString());
 	});
 	
-	videoFfmpegProcess.stderr.on('data', (data) => {
+	FfmpegAudioProcess.stderr.on('data', (data) => {
+	  console.error(data.toString());
+	});
+
+
+
+	FfmpegVideoProcess = spawn('python', [
+		'cameraoverlay.py'
+	]);
+	videoRunning = true;
+	
+	FfmpegVideoProcess.on('exit', (code) => {
+		console.log('startVideo() - ffmpeg VIDEO process exited');
+		videoRunning = false;
+		FfmpegVideoProcess = null;
+	});
+
+	FfmpegVideoProcess.stdout.on('data', (data) => {
+	  console.log(data.toString());
+	});
+	
+	FfmpegVideoProcess.stderr.on('data', (data) => {
 	  console.error(data.toString());
 	});
 	
@@ -508,11 +617,14 @@ function shutdownPwm(){
 	pwm.dispose();
 }
 
+targetWebsocketConnect();
+
 // set-up CTRL-C with graceful shutdown
 process.on("SIGINT", function () {
 	console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
 
 	shutdownPwm();
+	targetWebsocket.close();
 
 	process.exit(-1);
 });
