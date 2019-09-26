@@ -22,6 +22,10 @@ var videoHudSocketCon = null;
 var targetWebsocket = null;
 const targetAddress = '10.88.0.130';
 
+var shootingTimerDurationSecond = 10.1;
+var shootingScore = 0;
+var shootingRoundActive = false;
+
 var FfmpegVideoProcess = null;
 var videoRunning = false;
 
@@ -148,9 +152,12 @@ function handleIncomingControlMessage(ws, message) {
 			break;
 		case "startTargetTimer":
 			overlayStartTimer();
+			shootingScore = 0;
+			shootingRoundActive = true;
 			break;
 		case "stopTargetTimer":
 			overlayStopTimer();
+			shootingRoundActive = false;
 			break;
 		case "stopVideo":
 			stopVideoProcess();
@@ -317,6 +324,15 @@ function targetWebsocketMessageRecieved(message){
 			return;
 			break;
 		case 'targetDown':
+			console.log("Target Knocked!");
+			if(shootingRoundActive){
+				console.log("score!");
+				shootingScore ++;
+				overlayUpdateScore();
+			}else{
+				console.log("No Score - No shooting round active!");
+			}
+
 	}
 }
 function targetWebsocketSend(msg){
@@ -333,7 +349,8 @@ function targetWebsocketSetMode(){
 	targetWebsocketSend('{"cmd":"targetUp","value":"all"}');
 }
 function targetWebsocketStartTimer(){
-	targetWebsocketSend('{"cmd":"targetUp","value":"all"}');
+	shootingScore = 0;
+	shootingRoundActive = 1;
 }
 
 const videoServer = new WebSocket.Server({ noServer: true });
@@ -386,8 +403,24 @@ function videoHudSocketSendMessage(message){
 	}
 	videoHudSocketCon.write(message);
 }
+function overlayUpdateScore(){
+	
+	videoHudSocketSendMessage('{"text":"Score: '+shootingScore+'","x":10,"y":90,"id":"score","expires":false}');
+}
 function overlayStartTimer(){
-	videoHudSocketSendMessage('{"timer":true,"duration":10.1,"x":120,"y":120}');
+	
+	videoHudSocketSendMessage('{"text":"SHOOT!","x":10,"y":120,"id":"shoot","expires":false}');
+	videoHudSocketSendMessage('{"timer":true,"duration":'+shootingTimerDurationSecond+',"x":86,"y":120}');
+
+	overlayUpdateScore();
+
+	setTimeout(function(){
+		shootingRoundActive = false;
+		videoHudSocketSendMessage('{"text":true,"id":"shoot","hide":true}');
+		setTimeout(function(){
+			videoHudSocketSendMessage('{"text":true,"id":"score","hide":true}');
+		}, 4 * 1000);
+	}, shootingTimerDurationSecond * 1000);
 }
 function overlayStopTimer(){
 	videoHudSocketSendMessage('{"timer":true,"hide":true}');
