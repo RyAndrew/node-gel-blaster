@@ -6,6 +6,7 @@ var pca9685 = require("pca9685");
 const WebSocket = require('ws');
 
 const http = require('http');
+const net = require('net');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
@@ -14,6 +15,9 @@ const { spawn } = require('child_process');
 
 const httpPort = 8080;
 const httpVideoStreamKey = 'supersecret';
+
+const videoHudSocket = '/tmp/hudSocket';
+var videoHudSocketCon = null;
 
 var targetWebsocket = null;
 const targetAddress = '10.88.0.130';
@@ -124,7 +128,7 @@ webSocketServer.on('connection', function connection(ws, req) {
 });
 
 function handleIncomingControlMessage(ws, message) {
-	console.log('received: %s', message);
+	console.log('received: "%s"', message);
 	
 	let messageJson;
 	try{
@@ -139,8 +143,14 @@ function handleIncomingControlMessage(ws, message) {
 		return;
 	}
 	switch(messageJson.action){
+		case "startTargets":
+			targetWebsocketSetMode();
+			break;
 		case "startTargetTimer":
-			targetWebsocketStartTimer();
+			overlayStartTimer();
+			break;
+		case "stopTargetTimer":
+			overlayStopTimer();
 			break;
 		case "stopVideo":
 			stopVideoProcess();
@@ -149,7 +159,7 @@ function handleIncomingControlMessage(ws, message) {
 			startVideoProcess();
 			break;
 		case "readVideoRunning":
-			ws.send('{"msgType":"videoRunning","running":'+(videoRunning?1:0)+'}');
+			ws.send('{"cmd":"videoRunning","running":'+(videoRunning?1:0)+'}');
 
 			break;
 		case "setShoot":
@@ -284,13 +294,11 @@ function targetWebsocketConnect(afterConnectCb){
 		console.log('Target Websocket Connection Error ',error);
 	});
 
-	targetWebsocket.on('message', function(message) {
-		console.log('Target Websocket Message:');
-		console.log(message);
-		targetWebsocketMessageRecieved(message);
-	});
+	targetWebsocket.on('message', targetWebsocketMessageRecieved);
 }
 function targetWebsocketMessageRecieved(message){
+	console.log('received: "%s"', message);
+
 	let messageJson;
 	try{
 		messageJson = JSON.parse(message);
@@ -320,12 +328,12 @@ function targetWebsocketSend(msg){
 		targetWebsocket.send(msg);
 	}
 }
-function targetWebsocketStartTimer(){
-	//targetWebsocketSend('{"cmd":"mode","value":"all"}');
+function targetWebsocketSetMode(){
+	targetWebsocketSend('{"cmd":"mode","value":"all"}');
 	targetWebsocketSend('{"cmd":"targetUp","value":"all"}');
-	
-	
-
+}
+function targetWebsocketStartTimer(){
+	targetWebsocketSend('{"cmd":"targetUp","value":"all"}');
 }
 
 const videoServer = new WebSocket.Server({ noServer: true });
@@ -351,8 +359,39 @@ function broadcastVideoData(data) {
 			clientSocket.send(data);
 		}
 	});
-};
+}
+function videoHudSocketConnect(firstMessage){
+	
+	var videoHudSocketCon = net.createConnection(videoHudSocket);
 
+	videoHudSocketCon.on("connect", function() {
+		console.log("connected to hudSocket at "+videoHudSocket);
+		videoHudSocketCon.write(firstMessage);
+	});
+
+	videoHudSocketCon.on("error", function(error) {
+		console.log("hud socket error ", error);
+		videoHudSocketCon = null;
+	});
+
+	videoHudSocketCon.on("data", function(data) {
+		console.log("hud socket data received ", data);
+	});
+}
+function videoHudSocketSendMessage(message){
+	if(videoHudSocketCon === null){
+		console.log("overlay socket not connected");
+		videoHudSocketConnect(message);
+		return;
+	}
+	videoHudSocketCon.write(message);
+}
+function overlayStartTimer(){
+	videoHudSocketSendMessage('{"timer":true,"duration":10.1,"x":120,"y":120}');
+}
+function overlayStopTimer(){
+	videoHudSocketSendMessage('{"timer":true,"hide":true}');
+}
 function stopVideoProcess(){
 	if(FfmpegVideoProcess !== null){
 		FfmpegVideoProcess.kill();
@@ -422,6 +461,9 @@ function startVideoProcess(){
 
 	FfmpegAudioProcess = spawn('ffmpeg', [
 		//input video
+        '-hide_banner',
+        '-nostats',
+        '-loglevel','quiet',
 		'-vn', //no video
 		'-f','alsa', //alsa audio
 		'-i','hw:1', //audio device
@@ -434,7 +476,7 @@ function startVideoProcess(){
 		'-bf','0',
 		'-muxdelay','0.001',
 		'http://127.0.0.1:8080/sendVideo/?streamKey=supersecret'
-	]);
+	], {stdio: [process.stdin, process.stdout, process.stderr]});
 	audioRunning = true;
 	
 	FfmpegAudioProcess.on('exit', (code) => {
@@ -443,19 +485,19 @@ function startVideoProcess(){
 		FfmpegAudioProcess = null;
 	});
 
-	FfmpegAudioProcess.stdout.on('data', (data) => {
-	  console.log(data.toString());
-	});
+	// FfmpegAudioProcess.stdout.on('data', (data) => {
+	//   console.log(data.toString());
+	// });
 	
-	FfmpegAudioProcess.stderr.on('data', (data) => {
-	  console.error(data.toString());
-	});
+	// FfmpegAudioProcess.stderr.on('data', (data) => {
+	//   console.error(data.toString());
+	// });
+
+	// FfmpegAudioProcess.stdout.pipe(process.stdout);
+	// FfmpegAudioProcess.stderr.pipe(process.stderr);
 
 
-
-	FfmpegVideoProcess = spawn('python', [
-		'cameraoverlay.py'
-	]);
+	FfmpegVideoProcess = spawn('python', ['cameraoverlay.py'], {stdio: [process.stdin, process.stdout, process.stderr]});
 	videoRunning = true;
 	
 	FfmpegVideoProcess.on('exit', (code) => {
@@ -463,14 +505,17 @@ function startVideoProcess(){
 		videoRunning = false;
 		FfmpegVideoProcess = null;
 	});
-
-	FfmpegVideoProcess.stdout.on('data', (data) => {
-	  console.log(data.toString());
-	});
 	
-	FfmpegVideoProcess.stderr.on('data', (data) => {
-	  console.error(data.toString());
-	});
+	//FfmpegVideoProcess.stdout.pipe(process.stdout);
+	//FfmpegVideoProcess.stderr.pipe(process.stderr);
+
+	// FfmpegVideoProcess.stdout.on('data', (data) => {
+	//   console.log(data.toString());
+	// });
+	
+	// FfmpegVideoProcess.stderr.on('data', (data) => {
+	//   console.error(data.toString());
+	// });
 	
 }
 

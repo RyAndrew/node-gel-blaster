@@ -37,6 +37,8 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
     items: [
         {
             xtype: 'panel',
+            itemId: 'tabControls',
+            scrollable: true,
             title: 'Controls',
             items: [
                 {
@@ -702,13 +704,16 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         },
         {
             xtype: 'panel',
+            itemId: 'tabVideo',
             layout: 'vbox',
             title: 'Video',
             items: [
                 {
                     xtype: 'container',
+                    padding: 10,
                     defaults: {
-                        margin: 10
+                        margin: '0 0 0 10',
+                        height: 50
                     },
                     layout: 'hbox',
                     items: [
@@ -721,32 +726,47 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
                         },
                         {
                             xtype: 'button',
-                            height: 60,
-                            itemId: 'btnStart',
-                            width: 200,
-                            text: 'Start Video Process',
-                            listeners: {
-                                tap: 'onMybutton5Tap'
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            height: 60,
-                            itemId: 'btnStop',
-                            width: 200,
-                            text: 'Stop Video Process',
-                            listeners: {
-                                tap: 'onMybutton5Tap2'
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            height: 60,
                             itemId: 'btnView',
-                            width: 200,
-                            text: 'View Video',
+                            width: 120,
+                            text: 'Start Video',
                             listeners: {
-                                tap: 'onMybutton5Tap1'
+                                tap: 'onBtnViewTap'
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            itemId: 'btnStop',
+                            width: 120,
+                            text: 'Stop Video',
+                            listeners: {
+                                tap: 'onBtnStopTap'
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            itemId: 'btnStartTargets',
+                            width: 120,
+                            text: 'Start Targets',
+                            listeners: {
+                                tap: 'onBtnStartTargetsTap'
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            itemId: 'btnStartTimer',
+                            width: 100,
+                            text: 'Start Timer',
+                            listeners: {
+                                tap: 'onBtnStartTimerTap'
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            itemId: 'btnStopTimer',
+                            width: 100,
+                            text: 'Stop Timer',
+                            listeners: {
+                                tap: 'onBtnStopTimerTap'
                             }
                         }
                     ]
@@ -761,7 +781,8 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         }
     ],
     listeners: {
-        painted: 'onFormpanelPainted'
+        painted: 'onFormpanelPainted',
+        activeItemchange: 'onTabpanelActiveItemChange'
     },
 
     onMybutton8Tap: function(button, e, eOpts) {
@@ -772,7 +793,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         if(newValue && newValue.constructor === Array){
             newValue = newValue[0];
         }
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'setPan',
             value:newValue
         }));
@@ -782,7 +803,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         if(newValue && newValue.constructor === Array){
             newValue = newValue[0];
         }
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'setTilt',
             value:newValue
         }));
@@ -793,7 +814,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             newValue = newValue[0];
         }
 
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'updateTrexJaw',
             value:newValue
         }));
@@ -806,7 +827,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
 
         this.moveX = newValue;
 
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'move',
             x:this.moveX,
             y:this.moveY
@@ -818,7 +839,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             newValue = newValue[0];
         }
 
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'setShoot',
             value:newValue
         }));
@@ -857,7 +878,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             Ext.Msg.alert(' ','Invalid Constants! Please try again!');
             return false;
         }
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'updatePidConstants',
             p: p,
             i: i,
@@ -870,19 +891,19 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
     },
 
     onMybuttonTap2: function(button, e, eOpts) {
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'stopThrottle'
         }));
     },
 
     onMybuttonTap1: function(button, e, eOpts) {
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'stopSteeringControlLoop'
         }));
     },
 
     onMybuttonTap11: function(button, e, eOpts) {
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'startSteeringControlLoop'
         }));
     },
@@ -904,39 +925,46 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             return;
         }
 
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'arduinoCommand',
             command:command
         }));
 
     },
 
-    onMybutton5Tap: function(button, e, eOpts) {
-        this.checkVideoRunning();
-
-        this.socketSend(Ext.encode({
-            action:'startVideo'
-        }));
+    onBtnViewTap: function(button, e, eOpts) {
+        this.startVideo();
     },
 
-    onMybutton5Tap2: function(button, e, eOpts) {
-        this.socketSend(Ext.encode({
+    onBtnStopTap: function(button, e, eOpts) {
+        this.websocketSend(Ext.encode({
             action:'stopVideo'
         }));
     },
 
-    onMybutton5Tap1: function(button, e, eOpts) {
-        if(!this.videoStreamPlayer){
-            var canvas = document.getElementById('video-canvas');
-            var url = 'ws://'+document.location.hostname+':8080/viewVideo';
-            this.videoStreamPlayer = new JSMpeg.Player(url, {canvas: canvas});
-        }
+    onBtnStartTargetsTap: function(button, e, eOpts) {
+        this.websocketSend(Ext.encode({
+            action:'startTargets'
+        }));
+    },
+
+    onBtnStartTimerTap: function(button, e, eOpts) {
+        this.websocketSend(Ext.encode({
+            action:'startTargetTimer'
+        }));
+    },
+
+    onBtnStopTimerTap: function(button, e, eOpts) {
+        this.websocketSend(Ext.encode({
+            action:'stopTargetTimer'
+        }));
     },
 
     onFormpanelPainted: function(sender, element, eOpts) {
-        this.websocketInit();
-        this.gamepadInit();
+        this.webSocketCon = null;
+        this.websocketOpen();
 
+        this.gamepadInit();
 
         this.trexPanSlider = this.queryById('trexPanSlider');
         this.trexTiltSlider = this.queryById('trexTiltSlider');
@@ -961,74 +989,89 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         this.wsRightStickX = -1;
         this.wsRightStickY = -1;
         this.wsTriggerRight = -1;
+
+
+    },
+
+    onTabpanelActiveItemChange: function(sender, value, oldValue, eOpts) {
+        switch(value.getItemId()){
+            case 'tabVideo':
+                this.startVideo();
+        }
     },
 
     trexscream: function() {
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'trexscream'
         }));
     },
 
     playnextsound: function() {
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'playnextsound'
         }));
     },
 
-    websocketInit: function() {
-        	this.socket = new WebSocket('ws://'+window.location.host+'/wsapi');
+    websocketSend: function(message) {
+        if(this.webSocketCon === null || this.webSocketCon.readyState !== WebSocket.OPEN){
+            console.log('Sending to WebSocket failed - not connected');
+            return false;
+        }
 
-            this.recievedMessages = 0;
-            this.chartedMessages = 0;
+        this.webSocketCon.send(message);
+    },
 
-            this.chartArray = [];
-            this.chartStore = this.lookupViewModel().getStore('steeringChartStore');
-            this.steeringChart = this.queryById('steeringChart');
+    websocketOpen: function() {
+            if(this.webSocketCon !== null &&
+               ( this.webSocketCon.readyState === WebSocket.CONNECTING ||
+                this.webSocketCon.readyState === WebSocket.OPEN )
+            ){
+                //if the socket is already open, or connecting. dont open more than 1
+                this.appendDebugOutput("Websocket already open or connecting");
+                return;
+            }
 
             this.appendDebugOutput("Opening Websocket");
 
-        	this.socket.onerror = (function(){
-        		this.appendDebugOutput("error with websocket!");
-                this.socket = false;
-        	}).bind(this);
-        	this.socket.onclose = (function(){
-        		this.appendDebugOutput("websocket closed!");
-                this.socket = false;
+            try{
+                this.webSocketCon = new WebSocket('ws://'+window.location.host+'/wsapi');
+            }catch(err){
+                this.appendDebugOutput("Exception opening socket!");
+                this.appendDebugOutput(err.message);
+                this.webSocketCon = null;
+                return false;
+            }
 
-                Ext.defer(function(){ this.websocketInit(); },500,this);
-        	}).bind(this);
-
-        	this.socket.onmessage = this.socketReceive.bind(this);
-
-
-        	this.socket.onopen = (function(){
-                this.socketSend(Ext.encode({
-                    action:'getPidConstants'
+        	this.webSocketCon.onopen = function(){
+                this.websocketSend(Ext.encode({
+                    action:'getStatus'
                 }));
-        	}).bind(this);
+        	}.bind(this);
+
+        	this.webSocketCon.onmessage = this.websocketReceive.bind(this);
+
+        	this.webSocketCon.onerror = function(event){
+        		this.appendDebugOutput("error with websocket! " + event.error);
+
+                this.webSocketCon = null;
+                this.websocketReconnect();
+        	}.bind(this);
+
+        	this.webSocketCon.onclose = function(event){
+        		this.appendDebugOutput("websocket closed! "+event.code+" "+event.reason);
+
+                this.webSocketCon = null;
+                this.websocketReconnect();
+        	}.bind(this);
+
+
     },
 
-    socketSend: function(message) {
-        if(!this.socket){
-            console.log('Websocket not started or failed');
-            return false;
-        }
-
-        if(this.socket.readyState !== WebSocket.OPEN){
-            console.log('Websocket not connected');
-            return false;
-        }
-
-        this.socket.send(message);
+    websocketReconnect: function() {
+        Ext.defer(function(){ this.websocketOpen(); },500,this);
     },
 
-    stopSteeringMovement: function() {
-        this.socketSend(Ext.encode({
-            action:'stopSteeringMovement'
-        }));
-    },
-
-    socketReceive: function(message) {
+    websocketReceive: function(message) {
         // console.log('recieved message');
         // console.log(message.data);
         //this.appendDebugOutput('recieved message: '+message.data);
@@ -1036,14 +1079,14 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
 
         var jsonData = JSON.parse(message.data);
 
-        if(!jsonData.msgType){
-            console.log('Missing msgType!');
+        if(!jsonData.cmd){
+            console.log('Missing cmd!');
             console.log(jsonData);
             return false;
         }
-        switch(jsonData.msgType){
+        switch(jsonData.cmd){
             default:
-                console.log('Invalid msgType!');
+                console.log('Invalid cmd!');
                 console.log(jsonData);
                 break;
             case 'status':
@@ -1060,10 +1103,16 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
 
     },
 
+    stopSteeringMovement: function() {
+        this.websocketSend(Ext.encode({
+            action:'stopSteeringMovement'
+        }));
+    },
+
     sendUpdateSteering: function(value) {
         this.moveY = value;
 
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             //action:'setSteering',
             action:'move',
             y:this.moveY,
@@ -1335,7 +1384,8 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
     },
 
     appendDebugOutput: function(message) {
-        // console.log(message);
+        console.log(message);
+
         // console.log(this.queryById('debugOutputContainer'));
         var dom = this.queryById('debugOutputContainer').el.dom;
         // console.log(dom);
@@ -1345,17 +1395,37 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         containerDom.scrollTop = dom.clientHeight;
     },
 
+    startVideo: function() {
+        if(!this.YesCheckingVideoRunning){
+            this.YesCheckingVideoRunning = true;
+            this.checkVideoRunning();
+        }
+
+        this.websocketSend(Ext.encode({
+            action:'startVideo'
+        }));
+
+        if(!this.videoStreamPlayer){
+            var canvas = document.getElementById('video-canvas');
+            var url = 'ws://'+document.location.hostname+':8080/viewVideo';
+            this.videoStreamPlayer = new JSMpeg.Player(url, {canvas: canvas});
+        }
+    },
+
     checkVideoRunning: function() {
-        this.socketSend(Ext.encode({
+        this.websocketSend(Ext.encode({
             action:'readVideoRunning'
         }));
 
-        Ext.defer(function(){
-            this.checkVideoRunning();
-        }, 1000, this);
+        if(this.YesCheckingVideoRunning){
+            Ext.defer(function(){
+                this.checkVideoRunning();
+            }, 1000, this);
+        }
     },
 
     checkVideoRunningResponse: function(response) {
+        this.YesCheckingVideoRunning = response.running;
         this.queryById('videoStatus').setHtml('Status: ' + (response.running ? 'Running' : 'Stopped'));
     }
 
