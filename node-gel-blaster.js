@@ -25,6 +25,7 @@ const targetAddress = '10.88.0.130';
 var shootingTimerDurationSecond = 10.1;
 var shootingScore = 0;
 var shootingRoundActive = false;
+var hideScoreDelay = null;
 
 var FfmpegVideoProcess = null;
 var videoRunning = false;
@@ -132,18 +133,17 @@ webSocketServer.on('connection', function connection(ws, req) {
 });
 
 function handleIncomingControlMessage(ws, message) {
-	console.log('received: "%s"', message);
+	console.log('control, revc: "%s"', message);
 	
 	let messageJson;
 	try{
 		messageJson = JSON.parse(message);
 	}catch(err) {
-		console.log('invalid json message');
-		console.log(err);
+		console.log('control,invalid json message');
 		return;
 	}
 	if(!messageJson.action){
-		console.log('invalid json message, missing action');
+		console.log('control, invalid json message, missing action');
 		return;
 	}
 	switch(messageJson.action){
@@ -171,15 +171,15 @@ function handleIncomingControlMessage(ws, message) {
 			break;
 		case "setShoot":
 			if(!messageJson.hasOwnProperty('value')){
-				console.log('invalid json message, missing value');
+				console.log('control, setShoot, missing value');
 				return;
 			}
 			
 			if(messageJson.value >= 1){
-				console.log("FIRE!");
+				console.log("control, FIRE!");
 				pwm.channelOn(pwmShootChannel);
 			}else{
-				console.log("STOP FIRE!");
+				console.log("control, STOP FIRE!");
 				pwm.channelOff(pwmShootChannel);
 			}
 
@@ -194,7 +194,7 @@ function handleIncomingControlMessage(ws, message) {
 		//case "setThrottle":
 		case "move":
 			if(!messageJson.hasOwnProperty('y') || !messageJson.hasOwnProperty('x')){
-				console.log('invalid json message, missing value');
+				console.log('control, move, missing value');
 				return;
 			}
 			//move X is throttle
@@ -224,7 +224,7 @@ function handleIncomingControlMessage(ws, message) {
 
 			if (throttleValue > throttleMidpoint-throttleThreshold && throttleValue < throttleMidpoint+throttleThreshold) {
 
-				console.log("setThrottle stop "+throttleValue);
+				console.log("control, setThrottle stop "+throttleValue);
 				motorSetPercent(1, 0, 0);
 				motorSetPercent(2, 0, 0);
 
@@ -236,7 +236,7 @@ function handleIncomingControlMessage(ws, message) {
 					//forward
 					throttleValue = (throttleValue - 500) / 500;
 
-					console.log("setThrottle fwd throttleValue = "+throttleValue );
+					console.log("control, setThrottle fwd throttleValue = "+throttleValue );
 
 					motorSetPercent(1, 1, throttleValue);
 					motorSetPercent(2, 1, throttleValue);
@@ -245,7 +245,7 @@ function handleIncomingControlMessage(ws, message) {
 					//reverse
 					throttleValue = (500 - throttleValue) / 500;
 
-					console.log("setThrottle rev throttleValue = "+throttleValue );
+					console.log("control, setThrottle rev throttleValue = "+throttleValue );
 
 					motorSetPercent(1, -1, throttleValue);
 					motorSetPercent(2, -1, throttleValue);
@@ -255,94 +255,98 @@ function handleIncomingControlMessage(ws, message) {
 			break;
 		case "setTilt":
 			if(!messageJson.hasOwnProperty('value')){
-				console.log('invalid json message, missing value');
+				console.log('control, setTilt, missing value');
 				return;
 			}
 			var servoPercent = messageJson.value / 1000;
 
 			var servoValue = ServoRange * servoPercent + ServoMin;
 
-			console.log('tilt pwm = '+servoValue);
+			console.log('control, setTilt, pwm = '+servoValue);
 			pwm.setPulseLength(pwmTiltChannel, servoValue);
 			break;
 		case "setPan":
 			if(!messageJson.hasOwnProperty('value')){
-				console.log('invalid json message, missing value');
+				console.log('control, setPan, missing value');
 				return;
 			}
 			var servoPercent = messageJson.value / 1000;
 
 			var servoValue = ServoRange * servoPercent + ServoMin;
 
-			console.log('pan pwm = '+servoValue);
+			console.log('control, setPan, pwm = '+servoValue);
 			pwm.setPulseLength(pwmPanChannel, servoValue);
 			break;
 		default:
-			console.log("invalid action!");
+			console.log("control, unknown action!");
 			return;
 	}
 };
-
-function targetWebsocketConnect(afterConnectCb){
-	var afterConnectCallback = afterConnectCb || function(){};
+function targetWebsocketClose(){
+	if(targetWebsocket !== null ){
+		targetWebsocket.close();
+	}
+}
+function targetWebsocketConnect(){
 	if(targetWebsocket !== null){
 		return;
 	}
-	targetWebsocket = new WebSocket('ws://'+targetAddress+'/ws');
-	targetWebsocket.on('open', function() {
-		console.log('Target Websocket Connection Opened to '+targetAddress);
-		afterConnectCallback();
+	console.log("target websocket, connecting to "+targetAddress);
+	var newWebsocket = new WebSocket('ws://'+targetAddress+'/ws');
+	newWebsocket.on('open', function() {
+		targetWebsocket = newWebsocket;
+		console.log('target websocket, connection Opened to '+targetAddress);
 	});
-	targetWebsocket.on('close', function(code, reason) {
-		console.log('Target Websocket Connection Closed '+code+' '+reason);
+	newWebsocket.on('close', function(code, reason) {
+		console.log('target websocket, connection Closed '+code+' '+reason);
 		targetWebsocket = null;
+		setTimeout(targetWebsocketConnect, 2000);
 	});
-	targetWebsocket.on('error', function(error) {
-		console.log('Target Websocket Connection Error ',error);
+	newWebsocket.on('error', function(error) {
+		console.log('target websocket, connection Error ',error.code);
 	});
 
-	targetWebsocket.on('message', targetWebsocketMessageRecieved);
+	newWebsocket.on('message', targetWebsocketMessageRecieved);
 }
 function targetWebsocketMessageRecieved(message){
-	console.log('received: "%s"', message);
+	console.log('target websocket, msg rcvd: "%s"', message);
 
 	let messageJson;
 	try{
 		messageJson = JSON.parse(message);
 	}catch(err) {
-		console.log('invalid json message');
-		console.log(err);
+		console.log('target websocket, msg rcvd, invalid json');
 		return;
 	}
 	if(!messageJson.cmd){
-		console.log('invalid json message, missing cmd');
+		console.log('target websocket, msg rcvd, error no cmd');
 		return;
 	}
 	switch(messageJson.cmd){
 		default:
-			console.log("invalid cmd!");
+			console.log("target websocket, msg rcvd, error unknown cmd");
 			return;
 			break;
 		case 'targetDown':
-			console.log("Target Knocked!");
+			console.log("target websocket, msg rcvd, Target Knocked!");
 			if(shootingRoundActive){
 				console.log("score!");
 				shootingScore ++;
 				overlayUpdateScore();
 			}else{
-				console.log("No Score - No shooting round active!");
+				console.log("target websocket, msg rcvd, No Score - No shooting round active!");
 			}
 
 	}
 }
 function targetWebsocketSend(msg){
-	if(!targetWebsocket){
-		targetWebsocketConnect(function(){
-			targetWebsocket.send(msg);
-		});
-	}else{
-		targetWebsocket.send(msg);
+	if(!targetWebsocket || targetWebsocket.readyState !== WebSocket.OPEN){
+		console.log("target websocket send failed, not connected");
+		console.log(msg);
+		return;
 	}
+
+	targetWebsocket.send(msg);
 }
 function targetWebsocketSetMode(){
 	targetWebsocketSend('{"cmd":"mode","value":"all"}');
@@ -377,57 +381,80 @@ function broadcastVideoData(data) {
 		}
 	});
 }
-function videoHudSocketConnect(firstMessage){
+function videoHudSocketClose(){
 	
-	var videoHudSocketCon = net.createConnection(videoHudSocket);
+	if(videoHudSocketCon !== null){
+		videoHudSocketCon.end();
+	}
+}
+function videoHudSocketConnect(){
+	if(videoHudSocketCon !== null){
+		console.log("hud socket not connecting, already connected");
+		return;
+	}
 
-	videoHudSocketCon.on("connect", function() {
-		console.log("connected to hudSocket at "+videoHudSocket);
-		videoHudSocketCon.write(firstMessage);
+	console.log("hud socket connecting to "+videoHudSocket);
+	var newConnection = net.createConnection(videoHudSocket, function() {
+		videoHudSocketCon = newConnection;
+		console.log("hud socket connected");
 	});
 
-	videoHudSocketCon.on("error", function(error) {
-		console.log("hud socket error ", error);
+	newConnection.on("close", function(error) {
+		console.log("hud socket closed ", error);
 		videoHudSocketCon = null;
+		if(videoRunning){
+			setTimeout(videoHudSocketConnect, 2000);
+		}
 	});
 
-	videoHudSocketCon.on("data", function(data) {
+	newConnection.on("error", function(error) {
+		console.log("hud socket error ", error);
+	});
+
+	newConnection.on("data", function(data) {
 		console.log("hud socket data received ", data);
 	});
 }
 function videoHudSocketSendMessage(message){
 	if(videoHudSocketCon === null){
-		console.log("overlay socket not connected");
-		videoHudSocketConnect(message);
+		console.log("hud socket send failed, not connected");
 		return;
 	}
-	videoHudSocketCon.write(message);
+	videoHudSocketCon.write(message+'\n');
 }
 function overlayUpdateScore(){
 	
 	videoHudSocketSendMessage('{"text":"Score: '+shootingScore+'","x":10,"y":90,"id":"score","expires":false}');
 }
 function overlayStartTimer(){
-	
+
 	videoHudSocketSendMessage('{"text":"SHOOT!","x":10,"y":120,"id":"shoot","expires":false}');
-	videoHudSocketSendMessage('{"timer":true,"duration":'+shootingTimerDurationSecond+',"x":86,"y":120}');
+	videoHudSocketSendMessage('{"timer":true,"id":"shoottimer","duration":'+shootingTimerDurationSecond+',"x":86,"y":120}');
 
 	overlayUpdateScore();
-
-	setTimeout(function(){
+	
+	if(hideScoreDelay !== null){
+		clearTimeout(hideScoreDelay);
+	}
+	hideScoreDelay = setTimeout(function(){
+		hideScoreDelay = null;
 		shootingRoundActive = false;
-		videoHudSocketSendMessage('{"text":true,"id":"shoot","hide":true}');
+		videoHudSocketSendMessage('{"hide":"shoot"}');
 		setTimeout(function(){
-			videoHudSocketSendMessage('{"text":true,"id":"score","hide":true}');
+			videoHudSocketSendMessage('{"hide":"score"}');
 		}, 4 * 1000);
 	}, shootingTimerDurationSecond * 1000);
 }
 function overlayStopTimer(){
-	videoHudSocketSendMessage('{"timer":true,"hide":true}');
+	videoHudSocketSendMessage('{"hide":"shoottimer"}');
+	videoHudSocketSendMessage('{"hide":"score"}');
+	videoHudSocketSendMessage('{"hide":"shoot"}');
 }
 function stopVideoProcess(){
 	if(FfmpegVideoProcess !== null){
 		FfmpegVideoProcess.kill();
+	}
+	if(FfmpegAudioProcess !== null){
 		FfmpegAudioProcess.kill();
 	}
 }
@@ -514,7 +541,7 @@ function startVideoProcess(){
 	
 	FfmpegAudioProcess.on('exit', (code) => {
 		console.log('startVideo() - ffmpeg AUDIO process exited');
-		videoRunning = false;
+		audioRunning = false;
 		FfmpegAudioProcess = null;
 	});
 
@@ -530,13 +557,16 @@ function startVideoProcess(){
 	// FfmpegAudioProcess.stderr.pipe(process.stderr);
 
 
-	FfmpegVideoProcess = spawn('python', ['cameraoverlay.py'], {stdio: [process.stdin, process.stdout, process.stderr]});
+	FfmpegVideoProcess = spawn('python', ['gel_blaster_camera_hud.py'], {stdio: [process.stdin, process.stdout, process.stderr]});
 	videoRunning = true;
+	
+	setTimeout(videoHudSocketConnect, 1000);
 	
 	FfmpegVideoProcess.on('exit', (code) => {
 		console.log('startVideo() - ffmpeg VIDEO process exited');
 		videoRunning = false;
 		FfmpegVideoProcess = null;
+		videoHudSocketClose();
 	});
 	
 	//FfmpegVideoProcess.stdout.pipe(process.stdout);
@@ -702,7 +732,9 @@ process.on("SIGINT", function () {
 	console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
 
 	shutdownPwm();
-	targetWebsocket.close();
+
+	targetWebsocketClose();
+	videoHudSocketClose();
 
 	process.exit(-1);
 });
