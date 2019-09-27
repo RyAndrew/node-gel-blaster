@@ -283,22 +283,23 @@ function handleIncomingControlMessage(ws, message) {
 	}
 };
 
-function targetWebsocketConnect(afterConnectCb){
-	var afterConnectCallback = afterConnectCb || function(){};
+function targetWebsocketConnect(){
 	if(targetWebsocket !== null){
 		return;
 	}
+	console.log("connecting to target websocket at "+targetAddress);
 	targetWebsocket = new WebSocket('ws://'+targetAddress+'/ws');
 	targetWebsocket.on('open', function() {
 		console.log('Target Websocket Connection Opened to '+targetAddress);
-		afterConnectCallback();
 	});
 	targetWebsocket.on('close', function(code, reason) {
 		console.log('Target Websocket Connection Closed '+code+' '+reason);
 		targetWebsocket = null;
+		setTimeout(targetWebsocketConnect, 2000);
 	});
 	targetWebsocket.on('error', function(error) {
-		console.log('Target Websocket Connection Error ',error);
+		targetWebsocket = null;
+		console.log('Target Websocket Connection Error ',error.code);
 	});
 
 	targetWebsocket.on('message', targetWebsocketMessageRecieved);
@@ -336,13 +337,13 @@ function targetWebsocketMessageRecieved(message){
 	}
 }
 function targetWebsocketSend(msg){
-	if(!targetWebsocket){
-		targetWebsocketConnect(function(){
-			targetWebsocket.send(msg);
-		});
-	}else{
-		targetWebsocket.send(msg);
+	if(!targetWebsocket || targetWebsocket.readyState !== WebSocket.OPEN){
+		console.log("Send Msg Failed Target websocket connection not available.");
+		console.log(msg);
+		return;
 	}
+
+	targetWebsocket.send(msg);
 }
 function targetWebsocketSetMode(){
 	targetWebsocketSend('{"cmd":"mode","value":"all"}');
@@ -377,13 +378,25 @@ function broadcastVideoData(data) {
 		}
 	});
 }
-function videoHudSocketConnect(firstMessage){
+function videoHudSocketClose(){
+	videoHudSocketCon.end();
+	videoHudSocketCon = null;
+}
+function videoHudSocketConnect(){
 	
-	var videoHudSocketCon = net.createConnection(videoHudSocket);
+	console.log("connecting to hudSocket at "+videoHudSocket);
+	videoHudSocketCon = net.createConnection(videoHudSocket);
 
 	videoHudSocketCon.on("connect", function() {
-		console.log("connected to hudSocket at "+videoHudSocket);
-		videoHudSocketCon.write(firstMessage);
+		console.log("connected to hudSocket");
+	});
+
+	videoHudSocketCon.on("close", function(error) {
+		console.log("hud socket error ", error);
+		videoHudSocketCon = null;
+		if(videoRunning){
+			setTimeout(videoHudSocketConnect, 2000);
+		}
 	});
 
 	videoHudSocketCon.on("error", function(error) {
@@ -398,7 +411,6 @@ function videoHudSocketConnect(firstMessage){
 function videoHudSocketSendMessage(message){
 	if(videoHudSocketCon === null){
 		console.log("overlay socket not connected");
-		videoHudSocketConnect(message);
 		return;
 	}
 	videoHudSocketCon.write(message);
@@ -408,7 +420,7 @@ function overlayUpdateScore(){
 	videoHudSocketSendMessage('{"text":"Score: '+shootingScore+'","x":10,"y":90,"id":"score","expires":false}');
 }
 function overlayStartTimer(){
-	
+
 	videoHudSocketSendMessage('{"text":"SHOOT!","x":10,"y":120,"id":"shoot","expires":false}');
 	videoHudSocketSendMessage('{"timer":true,"duration":'+shootingTimerDurationSecond+',"x":86,"y":120}');
 
@@ -424,6 +436,7 @@ function overlayStartTimer(){
 }
 function overlayStopTimer(){
 	videoHudSocketSendMessage('{"timer":true,"hide":true}');
+	videoHudSocketSendMessage('{"text":true,"id":"score","hide":true}');
 }
 function stopVideoProcess(){
 	if(FfmpegVideoProcess !== null){
@@ -530,13 +543,16 @@ function startVideoProcess(){
 	// FfmpegAudioProcess.stderr.pipe(process.stderr);
 
 
-	FfmpegVideoProcess = spawn('python', ['cameraoverlay.py'], {stdio: [process.stdin, process.stdout, process.stderr]});
+	FfmpegVideoProcess = spawn('python', ['gel_blaster_camera_hud.py'], {stdio: [process.stdin, process.stdout, process.stderr]});
 	videoRunning = true;
+	
+	setTimeout(videoHudSocketConnect, 1000);
 	
 	FfmpegVideoProcess.on('exit', (code) => {
 		console.log('startVideo() - ffmpeg VIDEO process exited');
 		videoRunning = false;
 		FfmpegVideoProcess = null;
+		videoHudSocketClose();
 	});
 	
 	//FfmpegVideoProcess.stdout.pipe(process.stdout);
@@ -702,7 +718,9 @@ process.on("SIGINT", function () {
 	console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
 
 	shutdownPwm();
-	targetWebsocket.close();
+	if(targetWebsocket && targetWebsocket.readyState === WebSocket.OPEN){
+		targetWebsocket.close();
+	}
 
 	process.exit(-1);
 });
