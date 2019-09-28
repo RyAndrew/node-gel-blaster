@@ -21,7 +21,10 @@
     overflow: hidden;
 */
 }
-
+.video-parent .audio{
+    width:1px;
+    height:1px;
+}
 .video-parent .video{
     height:90%;
 }

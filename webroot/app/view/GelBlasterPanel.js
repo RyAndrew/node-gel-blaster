@@ -775,7 +775,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
                     xtype: 'container',
                     height: '100%',
                     userCls: 'video-parent',
-                    html: '<canvas id="video-canvas" class="video"></canvas>'
+                    html: '<canvas id="video-canvas" class="video"></canvas><canvas id="audio-canvas" class="audio"></canvas>'
                 }
             ]
         }
@@ -1052,9 +1052,6 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
 
         	this.webSocketCon.onerror = function(event){
         		this.appendDebugOutput("error with websocket! " + event.error);
-
-                this.webSocketCon = null;
-                this.websocketReconnect();
         	}.bind(this);
 
         	this.webSocketCon.onclose = function(event){
@@ -1410,6 +1407,11 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
             var url = 'ws://'+document.location.hostname+':8080/viewVideo';
             this.videoStreamPlayer = new JSMpeg.Player(url, {canvas: canvas});
         }
+        if(!this.audioStreamPlayer){
+            var canvas = document.getElementById('audio-canvas');
+            var url = 'ws://'+document.location.hostname+':8080/viewAudio';
+            this.audioStreamPlayer = new JSMpeg.Player(url, {canvas: canvas});
+        }
     },
 
     checkVideoRunning: function() {
@@ -1420,7 +1422,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         if(this.YesCheckingVideoRunning){
             Ext.defer(function(){
                 this.checkVideoRunning();
-            }, 1000, this);
+            }, 3000, this);
         }
     },
 
