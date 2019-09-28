@@ -369,11 +369,10 @@ videoServer.on('connection', function(socket, upgradeReq) {
 	socket.on('close', function(code, message){
 		videoServer.connectionCount--;
 		console.log(
-			'Disconnected WebSocket ('+videoServer.connectionCount+' total)'
+			'Disconnected Video WebSocket ('+videoServer.connectionCount+' total)'
 		);
 	});
 });
-
 function broadcastVideoData(data) {
 	videoServer.clients.forEach(function each(clientSocket) {
 		if (clientSocket.readyState === WebSocket.OPEN) {
@@ -381,6 +380,31 @@ function broadcastVideoData(data) {
 		}
 	});
 }
+
+const audioServer = new WebSocket.Server({ noServer: true });
+audioServer.on('connection', function(socket, upgradeReq) {
+	audioServer.connectionCount++;
+	console.log(
+		'New Audio Viewer Connection: ', 
+		(upgradeReq || socket.upgradeReq).socket.remoteAddress,
+		(upgradeReq || socket.upgradeReq).headers['user-agent'],
+		'('+audioServer.connectionCount+' total)'
+	);
+	socket.on('close', function(code, message){
+		audioServer.connectionCount--;
+		console.log(
+			'Disconnected Audio WebSocket ('+audioServer.connectionCount+' total)'
+		);
+	});
+});
+function broadcastAudioData(data) {
+	audioServer.clients.forEach(function each(clientSocket) {
+		if (clientSocket.readyState === WebSocket.OPEN) {
+			clientSocket.send(data);
+		}
+	});
+}
+
 function videoHudSocketClose(){
 	
 	if(videoHudSocketCon !== null){
@@ -399,8 +423,8 @@ function videoHudSocketConnect(){
 		console.log("hud socket connected");
 	});
 
-	newConnection.on("close", function(error) {
-		console.log("hud socket closed ", error);
+	newConnection.on("close", function(hadError ) {
+		console.log("hud socket closed, hadError: ", hadError);
 		videoHudSocketCon = null;
 		if(videoRunning){
 			setTimeout(videoHudSocketConnect, 2000);
@@ -408,7 +432,7 @@ function videoHudSocketConnect(){
 	});
 
 	newConnection.on("error", function(error) {
-		console.log("hud socket error ", error);
+		console.log("hud socket error ", error.code);
 	});
 
 	newConnection.on("data", function(data) {
@@ -535,7 +559,7 @@ function startVideoProcess(){
 		'-b:a','128k',
 		'-bf','0',
 		'-muxdelay','0.001',
-		'http://127.0.0.1:8080/sendVideo/?streamKey=supersecret'
+		'http://127.0.0.1:8080/sendAudio/?streamKey=supersecret'
 	], {stdio: [process.stdin, process.stdout, process.stderr]});
 	audioRunning = true;
 	
@@ -644,7 +668,43 @@ const httpServer = http.createServer(function (req, res) {
 			broadcastVideoData(data);
 		});
 		req.on('end',function(){
-			console.log('closed client');
+			console.log('sendVideo client closed');
+		});
+
+		return;
+	}
+
+
+	if(parsedUrl.pathname.indexOf('/sendAudio') != -1){
+
+		var error = true, errorDescription = 'missing streamKey parameter';
+
+		if(parsedUrl.query !== null ){
+			var parsedQuery = querystring.parse(parsedUrl.query);
+
+			if( parsedQuery.streamKey && parsedQuery.streamKey === httpVideoStreamKey){
+				error = false;
+			}else{
+				errorDescription = 'wrong streamKey parameter';
+			}
+		}
+		if(error === true){
+			console.log(`Failed Stream Connection: ${req.socket.remoteAddress}:${req.socket.remotePort} ${errorDescription}`);
+			res.end();
+			return;
+		}
+	
+		res.connection.setTimeout(0);
+		console.log(
+			'Incoming Audio Stream Connected: ' + 
+			req.socket.remoteAddress + ':' +
+			req.socket.remotePort
+		);
+		req.on('data', function(data){
+			broadcastAudioData(data);
+		});
+		req.on('end',function(){
+			console.log('sendAudio client closed');
 		});
 
 		return;
@@ -702,6 +762,11 @@ httpServer.on('upgrade', function upgrade(request, socket, head) {
 		case '/viewVideo': 
 			videoServer.handleUpgrade(request, socket, head, function done(ws) {
 				videoServer.emit('connection', ws, request);
+			});
+			break;
+		case '/viewAudio': 
+			audioServer.handleUpgrade(request, socket, head, function done(ws) {
+				audioServer.emit('connection', ws, request);
 			});
 			break;
 		default:
