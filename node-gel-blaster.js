@@ -454,6 +454,7 @@ function overlayStartTimer(){
 
 	videoHudSocketSendMessage('{"text":"SHOOT!","x":10,"y":120,"id":"shoot","expires":false}');
 	videoHudSocketSendMessage('{"timer":true,"id":"shoottimer","duration":'+shootingTimerDurationSecond+',"x":86,"y":120}');
+	videoHudSocketSendMessage('{"img":"crosshair1px.png","id":"crosshair","x":390,"y":150}');
 
 	overlayUpdateScore();
 	
@@ -464,6 +465,8 @@ function overlayStartTimer(){
 		hideScoreDelay = null;
 		shootingRoundActive = false;
 		videoHudSocketSendMessage('{"hide":"shoot"}');
+		videoHudSocketSendMessage('{"hide":"crosshair"}');
+
 		setTimeout(function(){
 			videoHudSocketSendMessage('{"hide":"score"}');
 		}, 4 * 1000);
@@ -473,6 +476,7 @@ function overlayStopTimer(){
 	videoHudSocketSendMessage('{"hide":"shoottimer"}');
 	videoHudSocketSendMessage('{"hide":"score"}');
 	videoHudSocketSendMessage('{"hide":"shoot"}');
+	videoHudSocketSendMessage('{"hide":"crosshair"}');
 }
 function stopVideoProcess(){
 	if(FfmpegVideoProcess !== null){
