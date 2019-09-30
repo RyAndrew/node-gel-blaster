@@ -16,6 +16,9 @@ const { spawn } = require('child_process');
 const httpPort = 8080;
 const httpVideoStreamKey = 'supersecret';
 
+var videoServerConnectionCount = 0;
+var audioServerConnectionCount = 0;
+
 const videoHudSocket = '/tmp/hudSocket';
 var videoHudSocketCon = null;
 
@@ -32,6 +35,19 @@ var videoRunning = false;
 
 var FfmpegAudioProcess = null;
 var audioRunning = false;
+
+
+var internetVideoStarted = false;
+var internetVideoConnection = null;
+var internetVideoReConnectDelayTime = 3000;
+var internetVideoUrl = 'vcn2.roboprojects.com:8055';
+var internetVideoUrlProtocol = 'http://'
+var internetVideoUrlPathVideo = '/sendVideo/';
+var internetVideoUrlPathAudio = '/sendAudio/';
+var internetVideoUrlKeyString = '?streamKey=';
+var internetVideoUrlKey = 'fartbuttpoo';
+
+var internetControlStarted = false;
 
 // PCA9685 options
 var options = {
@@ -131,7 +147,95 @@ webSocketServer.on('connection', function connection(ws, req) {
 
 	ws.send('{"connected":true}');
 });
+function internetVideoStart(url, key){
 
+	if(internetVideoUrl !== url || internetVideoUrlKey !== key){
+		internetVideoStop();
+	}
+	internetVideoUrl = url;
+	internetVideoUrlKey = key;
+
+	startVideoProcess();
+
+	internetVideoStarted = true;
+	internetVideoConnect();
+}
+function internetVideoStop(){
+	internetVideoStarted = false;
+	if(internetVideoConnection){
+		internetVideoConnection.end();
+	}
+	internetVideoStarted = false;
+	internetVideoConnection = null;
+}
+function internetControlStart(){
+
+	internetControlStarted = true;
+}
+function internetControlStop(){
+
+	internetControlStarted = false;
+}
+function internetVideoReConnectDelay(){
+	setTimeout(function(){
+		internetVideoConnect();
+	}, internetVideoReConnectDelayTime);
+}
+function internetVideoConnect(){
+	if(internetVideoConnection !== null){
+		console.log("internetVideoConnect failed, already connected");
+		return;
+	}
+	let url = internetVideoUrlProtocol + internetVideoUrl + internetVideoUrlPathVideo + internetVideoUrlKeyString + internetVideoUrlKey;
+	let options = {
+		family:4,
+		timeout: 5000,
+		headers:{
+			'Transfer-Encoding':'chunked'
+		}
+	};
+	internetVideoConnection = http.request(url, options);
+	
+	internetVideoConnection.on('socket', function(){
+		console.log("internetVideoConnect socket");
+	});
+	internetVideoConnection.on('connect', function(){
+		console.log("internetVideoConnect connected");
+	});
+	internetVideoConnection.on('aborted', function(){
+		console.log("internetVideoConnect aborted");
+		internetVideoConnection = null;
+	});
+	internetVideoConnection.on('close', function(){
+		console.log("internetVideoConnect close");
+		internetVideoConnection = null;
+		internetVideoReConnectDelay();
+	});
+	internetVideoConnection.on('error', function(){
+		console.log("internetVideoConnect error");
+		internetVideoConnection = null;
+	});
+	internetVideoConnection.on('timeout', function(){
+		console.log("internetVideoConnect timeout");
+		internetVideoConnection = null;
+		internetVideoReConnectDelay();
+	});
+	internetVideoConnection.on('response', function(){
+		console.log("internetVideoConnect response");
+	});
+	internetVideoConnection.flushHeaders();
+	console.log("internetVideoConnect connecting");
+}
+function internetVideoSendVideoData(data){
+
+	if(internetVideoConnection === null ){
+		return;
+	}
+	internetVideoConnection.write(data);
+}
+function internetVideoSendAudioData(data){
+	
+}
 function handleIncomingControlMessage(ws, message) {
 	console.log('control, revc: "%s"', message);
 	
@@ -147,6 +251,40 @@ function handleIncomingControlMessage(ws, message) {
 		return;
 	}
 	switch(messageJson.action){
+		case "internetVideo":
+			if(!messageJson.hasOwnProperty("enabled")){
+				console.log('control, internetVideo action, missing enabled');
+				return;
+			}
+			if(!messageJson.hasOwnProperty("server")){
+				console.log('control, internetVideo action, missing server');
+				return;
+			}
+			if(!messageJson.hasOwnProperty("key")){
+				console.log('control, internetVideo action, missing key');
+				return;
+			}
+			if(messageJson.enabled){
+				console.log('control, internetVideo action, enabled');
+				internetVideoStart(messageJson.server, messageJson.key);
+			}else{
+				console.log('control, internetVideo action, disabled');
+				internetVideoStop();
+			}
+			break;
+		case "internetControl":
+			if(!messageJson.hasOwnProperty("enabled")){
+				console.log('control, internetControl action, missing enabled');
+				return;
+			}
+			if(messageJson.enabled){
+				console.log('control, internetControl action, enabled');
+				internetControlStart();
+			}else{
+				console.log('control, internetControl action, disabled');
+				internetControlStop();
+			}
+			break;
 		case "startTargets":
 			targetWebsocketSetMode();
 			break;
@@ -166,7 +304,7 @@ function handleIncomingControlMessage(ws, message) {
 			startVideoProcess();
 			break;
 		case "readVideoRunning":
-			ws.send('{"cmd":"videoRunning","running":'+(videoRunning?1:0)+'}');
+			ws.send('{"cmd":"videoRunning","running":'+(videoRunning === true?1:0)+'}');
 
 			break;
 		case "setShoot":
@@ -359,17 +497,17 @@ function targetWebsocketStartTimer(){
 
 const videoServer = new WebSocket.Server({ noServer: true });
 videoServer.on('connection', function(socket, upgradeReq) {
-	videoServer.connectionCount++;
+	videoServerConnectionCount++;
 	console.log(
 		'New Video Viewer Connection: ', 
 		(upgradeReq || socket.upgradeReq).socket.remoteAddress,
 		(upgradeReq || socket.upgradeReq).headers['user-agent'],
-		'('+videoServer.connectionCount+' total)'
+		'('+videoServerConnectionCount+' total)'
 	);
 	socket.on('close', function(code, message){
-		videoServer.connectionCount--;
+		videoServerConnectionCount--;
 		console.log(
-			'Disconnected Video WebSocket ('+videoServer.connectionCount+' total)'
+			'Disconnected Video WebSocket ('+videoServerConnectionCount+' total)'
 		);
 	});
 });
@@ -383,17 +521,17 @@ function broadcastVideoData(data) {
 
 const audioServer = new WebSocket.Server({ noServer: true });
 audioServer.on('connection', function(socket, upgradeReq) {
-	audioServer.connectionCount++;
+	audioServerConnectionCount++;
 	console.log(
 		'New Audio Viewer Connection: ', 
 		(upgradeReq || socket.upgradeReq).socket.remoteAddress,
 		(upgradeReq || socket.upgradeReq).headers['user-agent'],
-		'('+audioServer.connectionCount+' total)'
+		'('+audioServerConnectionCount+' total)'
 	);
 	socket.on('close', function(code, message){
-		audioServer.connectionCount--;
+		audioServerConnectionCount--;
 		console.log(
-			'Disconnected Audio WebSocket ('+audioServer.connectionCount+' total)'
+			'Disconnected Audio WebSocket ('+audioServerConnectionCount+' total)'
 		);
 	});
 });
@@ -426,7 +564,7 @@ function videoHudSocketConnect(){
 	newConnection.on("close", function(hadError ) {
 		console.log("hud socket closed, hadError: ", hadError);
 		videoHudSocketCon = null;
-		if(videoRunning){
+		if(videoRunning === true){
 			setTimeout(videoHudSocketConnect, 2000);
 		}
 	});
@@ -487,7 +625,7 @@ function stopVideoProcess(){
 	}
 }
 function startVideoProcess(){
-	if(videoRunning){
+	if(videoRunning === true){
 		console.log('startVideo() - Video already running - not starting');
 		return;
 	}
@@ -670,6 +808,9 @@ const httpServer = http.createServer(function (req, res) {
 		);
 		req.on('data', function(data){
 			broadcastVideoData(data);
+			if(internetVideoStarted){
+				internetVideoSendVideoData(data);
+			}
 		});
 		req.on('end',function(){
 			console.log('sendVideo client closed');
@@ -706,6 +847,9 @@ const httpServer = http.createServer(function (req, res) {
 		);
 		req.on('data', function(data){
 			broadcastAudioData(data);
+			if(internetVideoStarted){
+				internetVideoSendAudioData(data);
+			}
 		});
 		req.on('end',function(){
 			console.log('sendAudio client closed');
