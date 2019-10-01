@@ -1022,7 +1022,10 @@ Ext.define('GelBlasterInternet.view.GelBlasterPanel', {
     },
 
     onTabpanelActiveItemChange: function(sender, value, oldValue, eOpts) {
-
+        switch(value.getItemId()){
+            case 'tabVideo':
+                this.startVideo();
+        }
     },
 
     onFormpanelPainted: function(sender, element, eOpts) {

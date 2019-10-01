@@ -1022,10 +1022,6 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
     },
 
     onTabpanelActiveItemChange: function(sender, value, oldValue, eOpts) {
-        console.log('tab change!');
-        console.log(arguments);
-        console.log(value.getItemId());
-
         switch(value.getItemId()){
             case 'tabVideo':
                 this.startVideo();
