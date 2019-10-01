@@ -62,9 +62,16 @@ var options = {
 	//debug: true
 };
 
+//full range:
+//var ServoMax = 2400;
+//var ServoMin = 800;
 var ServoMax = 2400;
 var ServoMin = 800;
 var ServoRange = ServoMax - ServoMin;
+
+var ServoTiltMax = 2156;
+var ServoTiltMin = 1100;
+var ServoTiltRange = ServoTiltMax - ServoTiltMin;
 
 var pwmPanChannel = 15;
 var pwmTiltChannel = 14;
@@ -514,7 +521,7 @@ function handleIncomingControlMessage(wsp, message) {
 			}
 			var servoPercent = messageJson.value / 1000;
 
-			var servoValue = ServoRange * servoPercent + ServoMin;
+			var servoValue = ServoTiltRange * servoPercent + ServoTiltMin;
 
 			console.log('control, setTilt, pwm = '+servoValue);
 			pwm.setPulseLength(pwmTiltChannel, servoValue);
