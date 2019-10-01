@@ -200,7 +200,7 @@ function internetVideoConnect(){
 	let url = internetVideoUrlProtocol + internetVideoUrl + internetVideoUrlPathVideo + internetVideoUrlKeyString + internetVideoUrlKey;
 	let options = {
 		family:4,
-		timeout: 5000,
+		timeout: 0,
 		headers:{
 			'Transfer-Encoding':'chunked'
 		}
@@ -226,11 +226,11 @@ function internetVideoConnect(){
 		console.log("internetVideoConnect error");
 		internetVideoConnection = null;
 	});
-	internetVideoConnection.on('timeout', function(){
-		console.log("internetVideoConnect timeout");
-		internetVideoConnection = null;
-		internetVideoReConnectDelay();
-	});
+	// internetVideoConnection.on('timeout', function(){
+	// 	console.log("internetVideoConnect timeout");
+	// 	internetVideoConnection = null;
+	// 	internetVideoReConnectDelay();
+	// });
 	internetVideoConnection.on('response', function(){
 		console.log("internetVideoConnect response");
 	});
@@ -258,7 +258,7 @@ function internetAudioConnect(){
 	let url = internetVideoUrlProtocol + internetVideoUrl + internetVideoUrlPathAudio + internetVideoUrlKeyString + internetVideoUrlKey;
 	let options = {
 		family:4,
-		timeout: 5000,
+		timeout: 0,
 		headers:{
 			'Transfer-Encoding':'chunked'
 		}
@@ -284,11 +284,11 @@ function internetAudioConnect(){
 		console.log("internetAudioConnect error");
 		internetAudioConnection = null;
 	});
-	internetAudioConnection.on('timeout', function(){
-		console.log("internetAudioConnect timeout");
-		internetAudioConnection = null;
-		internetAudioReConnectDelay();
-	});
+	// internetAudioConnection.on('timeout', function(){
+	// 	console.log("internetAudioConnect timeout");
+	// 	internetAudioConnection = null;
+	// 	internetAudioReConnectDelay();
+	// });
 	internetAudioConnection.on('response', function(){
 		console.log("internetAudioConnect response");
 	});
@@ -849,7 +849,7 @@ function startVideoProcess(){
 	FfmpegVideoProcess = spawn('python', ['gel_blaster_camera_hud.py'], {stdio: [process.stdin, process.stdout, process.stderr]});
 	videoRunning = true;
 	
-	setTimeout(videoHudSocketConnect, 1000);
+	videoHudSocketConnect();
 	
 	FfmpegVideoProcess.on('exit', (code) => {
 		console.log('startVideo() - ffmpeg VIDEO process exited');
