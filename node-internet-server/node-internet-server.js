@@ -13,17 +13,36 @@ const { spawn } = require('child_process');
 const httpPort = 8055;
 const httpVideoStreamKey = 'supersecret';
 
+var controlConnectionWebSocket = null;
+
 var videoServerConnectionCount = 0;
 var audioServerConnectionCount = 0;
 
 const webSocketServer = new WebSocket.Server({ noServer: true });
 
+webSocketServer.on('controlconnection', function connection(ws, req) {
+
+	const ip = req.connection.remoteAddress;
+	console.log('controlconnection from ' + ip);
+
+	controlConnectionWebSocket = ws;
+	
+	ws.on('message', function(message){
+		console.log('controlconnection message ',message);
+	});
+
+	ws.on('close', function clear() {
+		console.log('controlconnection closed for ' + ip);
+	});
+
+	ws.send('{"controlconnected":true}');
+});
 webSocketServer.on('connection', function connection(ws, req) {
 
 	const ip = req.connection.remoteAddress;
 	console.log('connection from ' + ip);
 
-	 ws.on('message', function(message){
+	ws.on('message', function(message){
 	 	handleIncomingControlMessage(ws, message);
 	});
 
@@ -47,6 +66,10 @@ function handleIncomingControlMessage(ws, message) {
 	if(!messageJson.action){
 		console.log('control, invalid json message, missing action');
 		return;
+	}
+
+	if(controlConnectionWebSocket !== null){
+		controlConnectionWebSocket.send(message);
 	}
 
 };
@@ -247,6 +270,11 @@ httpServer.on('upgrade', function upgrade(request, socket, head) {
 	const pathname = url.parse(request.url).pathname;
 
 	switch(pathname){
+		case '/control': 
+			webSocketServer.handleUpgrade(request, socket, head, function done(ws) {
+				webSocketServer.emit('controlconnection', ws, request);
+			});
+			break;
 		case '/wsapi': 
 			webSocketServer.handleUpgrade(request, socket, head, function done(ws) {
 				webSocketServer.emit('connection', ws, request);

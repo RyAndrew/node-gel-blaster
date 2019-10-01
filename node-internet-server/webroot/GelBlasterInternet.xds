@@ -1,10 +1,10 @@
 {
-    "name": "GelBlaster",
+    "name": "GelBlasterInternet",
     "settings": {
         "cmd": {},
         "urlPrefixTemplate": "http://localhost:{port}/{path}",
         "urlPrefix": "http://localhost/",
-        "exportPath": "J:/Data/ApacheData/dev.local/gelblaster",
+        "exportPath": "E:/gelblasterInternet",
         "buildShouldOverwriteIndex": true,
         "generateArchitectVersion": false,
         "spacesToIndent": 4,
@@ -23,7 +23,8 @@
         },
         "displayfield-ExtBox1-1118-inputEl": "a new version of the framework is available",
         "displayfield-ExtBox1-1231-inputEl": "a new version of the framework is available",
-        "displayfield-ExtBox1-1180-inputEl": "a new version of the framework is available"
+        "displayfield-ExtBox1-1180-inputEl": "a new version of the framework is available",
+        "displayfield-ExtBox1-1137-inputEl": "a new version of the framework is available"
     },
     "xdsVersion": "4.2.5",
     "xdsBuild": 420,
@@ -40,7 +41,7 @@
         "controller": [],
         "model": [],
         "resource": [
-            "0c022e25-38e2-46bb-a65a-9656cfc8c752",
+            "50032965-89f9-4e1d-9e99-c70d5a6037c0",
             "0bed7e48-343e-4468-9c92-33f050cfcaf9",
             "d106f179-4cce-400b-b64e-9d1b1d7b01e5",
             "ba1b60b1-aa59-47c9-bd29-a22025542c35",

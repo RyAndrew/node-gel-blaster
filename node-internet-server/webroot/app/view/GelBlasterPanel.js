@@ -13,12 +13,12 @@
  * Do NOT hand edit this file.
  */
 
-Ext.define('GelBlaster.view.GelBlasterPanel', {
+Ext.define('GelBlasterInternet.view.GelBlasterPanel', {
     extend: 'Ext.tab.Panel',
     alias: 'widget.gelblasterpanel',
 
     requires: [
-        'GelBlaster.view.GelBlasterPanelViewModel',
+        'GelBlasterInternet.view.GelBlasterPanelViewModel',
         'Ext.Panel',
         'Ext.Button',
         'Ext.field.Number',
@@ -1022,14 +1022,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
     },
 
     onTabpanelActiveItemChange: function(sender, value, oldValue, eOpts) {
-        console.log('tab change!');
-        console.log(arguments);
-        console.log(value.getItemId());
 
-        switch(value.getItemId()){
-            case 'tabVideo':
-                this.startVideo();
-        }
     },
 
     onFormpanelPainted: function(sender, element, eOpts) {
@@ -1062,7 +1055,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         this.wsRightStickY = -1;
         this.wsTriggerRight = -1;
 
-        this.messageQueue = [];
+
     },
 
     trexscream: function() {
@@ -1077,14 +1070,9 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         }));
     },
 
-    websocketSend: function(message, queue) {
-        var queueP = queue || false;
-
+    websocketSend: function(message) {
         if(this.webSocketCon === null || this.webSocketCon.readyState !== WebSocket.OPEN){
             console.log('Sending to WebSocket failed - not connected');
-            if(queueP){
-                this.messageQueue.push(message);
-            }
             return false;
         }
 
@@ -1116,11 +1104,6 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
                 this.websocketSend(Ext.encode({
                     action:'getStatus'
                 }));
-                if(this.messageQueue.length > 0){
-                    Ext.each(this.messageQueue, function(msg){
-                        this.websocketSend(msg);
-                    }, this);
-                }
         	}.bind(this);
 
         	this.webSocketCon.onmessage = this.websocketReceive.bind(this);
@@ -1468,42 +1451,21 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
     },
 
     startVideo: function() {
-        if(!this.YesCheckingVideoRunning){
-            this.YesCheckingVideoRunning = true;
-            this.checkVideoRunning();
-        }
 
         this.websocketSend(Ext.encode({
             action:'startVideo'
-        }), true);
+        }));
 
         if(!this.videoStreamPlayer){
             var canvas = document.getElementById('video-canvas');
-            var url = 'ws://'+document.location.hostname+':8080/viewVideo';
+            var url = 'ws://'+document.location.host+'/viewVideo';
             this.videoStreamPlayer = new JSMpeg.Player(url, {canvas: canvas});
         }
         if(!this.audioStreamPlayer){
             var canvas = document.getElementById('audio-canvas');
-            var url = 'ws://'+document.location.hostname+':8080/viewAudio';
+            var url = 'ws://'+document.location.host+'/viewAudio';
             this.audioStreamPlayer = new JSMpeg.Player(url, {canvas: canvas});
         }
-    },
-
-    checkVideoRunning: function() {
-        this.websocketSend(Ext.encode({
-            action:'readVideoRunning'
-        }));
-
-        if(this.YesCheckingVideoRunning){
-            Ext.defer(function(){
-                this.checkVideoRunning();
-            }, 3000, this);
-        }
-    },
-
-    checkVideoRunningResponse: function(response) {
-        this.YesCheckingVideoRunning = response.running;
-        this.queryById('videoStatus').setHtml('Status: ' + (response.running ? 'Running' : 'Stopped'));
     }
 
 });

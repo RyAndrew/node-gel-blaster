@@ -25,7 +25,7 @@ var videoHudSocketCon = null;
 var targetWebsocket = null;
 const targetAddress = '10.88.0.130';
 
-var shootingTimerDurationSecond = 10.1;
+var shootingTimerDurationSecond = 30.1;
 var shootingScore = 0;
 var shootingRoundActive = false;
 var hideScoreDelay = null;
@@ -39,6 +39,7 @@ var audioRunning = false;
 
 var internetVideoStarted = false;
 var internetVideoConnection = null;
+var internetAudioConnection = null;
 var internetVideoReConnectDelayTime = 3000;
 var internetVideoUrl = 'vcn2.roboprojects.com:8055';
 var internetVideoUrlProtocol = 'http://'
@@ -48,6 +49,9 @@ var internetVideoUrlKeyString = '?streamKey=';
 var internetVideoUrlKey = 'fartbuttpoo';
 
 var internetControlStarted = false;
+var internetControlWebSocket = null;
+var internetControlUrl = internetVideoUrl;
+var internetControlUrlPath = '/control';
 
 // PCA9685 options
 var options = {
@@ -159,22 +163,22 @@ function internetVideoStart(url, key){
 
 	internetVideoStarted = true;
 	internetVideoConnect();
+	internetAudioConnect();
 }
 function internetVideoStop(){
 	internetVideoStarted = false;
+
 	if(internetVideoConnection){
 		internetVideoConnection.end();
 	}
-	internetVideoStarted = false;
 	internetVideoConnection = null;
-}
-function internetControlStart(){
 
-	internetControlStarted = true;
-}
-function internetControlStop(){
+	if(internetAudioConnection){
+		internetAudioConnection.end();
+	}
+	internetAudioConnection = null;
 
-	internetControlStarted = false;
+	internetVideoStarted = false;
 }
 function internetVideoReConnectDelay(){
 	setTimeout(function(){
@@ -233,10 +237,120 @@ function internetVideoSendVideoData(data){
 	}
 	internetVideoConnection.write(data);
 }
-function internetVideoSendAudioData(data){
-	
+
+function internetAudioReConnectDelay(){
+	setTimeout(function(){
+		internetAudioConnect();
+	}, internetVideoReConnectDelayTime);
 }
-function handleIncomingControlMessage(ws, message) {
+function internetAudioConnect(){
+	if(internetAudioConnection !== null){
+		console.log("internetAudioConnect failed, already connected");
+		return;
+	}
+	let url = internetVideoUrlProtocol + internetVideoUrl + internetVideoUrlPathAudio + internetVideoUrlKeyString + internetVideoUrlKey;
+	let options = {
+		family:4,
+		timeout: 5000,
+		headers:{
+			'Transfer-Encoding':'chunked'
+		}
+	};
+	internetAudioConnection = http.request(url, options);
+	
+	internetAudioConnection.on('socket', function(){
+		console.log("internetAudioConnect socket");
+	});
+	internetAudioConnection.on('connect', function(){
+		console.log("internetAudioConnect connected");
+	});
+	internetAudioConnection.on('aborted', function(){
+		console.log("internetAudioConnect aborted");
+		internetAudioConnection = null;
+	});
+	internetAudioConnection.on('close', function(){
+		console.log("internetAudioConnect close");
+		internetAudioConnection = null;
+		internetAudioReConnectDelay();
+	});
+	internetAudioConnection.on('error', function(){
+		console.log("internetAudioConnect error");
+		internetAudioConnection = null;
+	});
+	internetAudioConnection.on('timeout', function(){
+		console.log("internetAudioConnect timeout");
+		internetAudioConnection = null;
+		internetAudioReConnectDelay();
+	});
+	internetAudioConnection.on('response', function(){
+		console.log("internetAudioConnect response");
+	});
+	internetAudioConnection.flushHeaders();
+	console.log("internetAudioConnect connecting");
+}
+function internetVideoSendAudioData(data){
+
+	if(internetAudioConnection === null ){
+		return;
+	}
+	internetAudioConnection.write(data);
+}
+
+
+
+
+function internetControlStart(){
+	internetControlWebSocketConnect();
+	internetControlStarted = true;
+}
+function internetControlStop(){
+	internetControlWebSocketClose();
+	internetControlStarted = false;
+}
+function internetControlWebSocketClose(){
+	if(internetControlWebSocket !== null ){
+		internetControlWebSocket.close();
+	}
+}
+function internetControlWebSocketConnect(){
+	if(internetControlWebSocket !== null){
+		return;
+	}
+	console.log('internet control target websocket, connecting to '+internetControlUrl);
+	internetControlWebSocket = new WebSocket('ws://'+internetControlUrl+ internetControlUrlPath);
+	internetControlWebSocket.on('open', function() {
+		console.log('internet control websocket, connection Opened to '+internetControlUrl);
+	});
+	internetControlWebSocket.on('close', function(code, reason) {
+		console.log('internet control websocket, connection Closed '+code+' '+reason);
+		internetControlWebSocket = null;
+		setTimeout(internetControlWebSocketConnect, 2000);
+	});
+	internetControlWebSocket.on('error', function(error) {
+		console.log('internet control websocket, connection Error ',error.code);
+	});
+
+	internetControlWebSocket.on('message', internetControlWebSocketMessageRecieved);
+}
+function internetControlWebSocketMessageRecieved(message){
+	console.log('internet control websocket, msg rcvd: "%s"', message);
+	handleIncomingControlMessage(false, message);
+}
+function InternetControlWebsocketSend(msg){
+	if(!internetControlWebSocket || internetControlWebSocket.readyState !== WebSocket.OPEN){
+		console.log("internet control websocket, send failed, not connected");
+		console.log(msg);
+		return;
+	}
+
+	internetControlWebSocket.send(msg);
+}
+
+
+
+
+function handleIncomingControlMessage(wsp, message) {
+	var ws = wsp || false;
 	console.log('control, revc: "%s"', message);
 	
 	let messageJson;
@@ -304,7 +418,9 @@ function handleIncomingControlMessage(ws, message) {
 			startVideoProcess();
 			break;
 		case "readVideoRunning":
-			ws.send('{"cmd":"videoRunning","running":'+(videoRunning === true?1:0)+'}');
+			if(ws !== false){
+				ws.send('{"cmd":"videoRunning","running":'+(videoRunning === true?1:0)+'}');
+			}
 
 			break;
 		case "setShoot":

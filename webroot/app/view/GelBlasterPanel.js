@@ -21,11 +21,11 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         'GelBlaster.view.GelBlasterPanelViewModel',
         'Ext.Panel',
         'Ext.Button',
-        'Ext.field.Slider',
         'Ext.field.Number',
         'Ext.chart.CartesianChart',
         'Ext.chart.axis.Numeric',
-        'Ext.chart.series.Line'
+        'Ext.chart.series.Line',
+        'Ext.field.Toggle'
     ],
 
     viewModel: {
@@ -778,11 +778,53 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
                     html: '<canvas id="video-canvas" class="video"></canvas><canvas id="audio-canvas" class="audio"></canvas>'
                 }
             ]
+        },
+        {
+            xtype: 'panel',
+            bodyPadding: 20,
+            title: 'Internet',
+            items: [
+                {
+                    xtype: 'textfield',
+                    itemId: 'internetServer',
+                    name: 'internetServer',
+                    label: 'Server',
+                    labelWidth: 65,
+                    value: 'vcn2.roboprojects.com:8055'
+                },
+                {
+                    xtype: 'textfield',
+                    itemId: 'internetKey',
+                    name: 'internetKey',
+                    label: 'Key',
+                    labelWidth: 65,
+                    value: 'fartbuttpoo'
+                },
+                {
+                    xtype: 'togglefield',
+                    itemId: 'enableInternetVideo',
+                    name: 'enableStreamToInternet',
+                    label: 'Stream To Internet',
+                    labelWidth: 140,
+                    listeners: {
+                        change: 'onMytogglefieldChange'
+                    }
+                },
+                {
+                    xtype: 'togglefield',
+                    itemId: 'mytogglefield1',
+                    label: 'Control via Internet',
+                    labelWidth: 140,
+                    listeners: {
+                        change: 'onMytogglefield1Change'
+                    }
+                }
+            ]
         }
     ],
     listeners: {
-        painted: 'onFormpanelPainted',
-        activeItemchange: 'onTabpanelActiveItemChange'
+        activeItemchange: 'onTabpanelActiveItemChange',
+        painted: 'onFormpanelPainted'
     },
 
     onMybutton8Tap: function(button, e, eOpts) {
@@ -960,6 +1002,36 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         }));
     },
 
+    onMytogglefieldChange: function(togglefield, newValue, oldValue, eOpts) {
+
+        this.websocketSend(Ext.encode({
+            action:'internetVideo',
+            enabled:newValue,
+            server:this.queryById('internetServer').getValue(),
+            key:this.queryById('internetKey').getValue()
+        }));
+    },
+
+    onMytogglefield1Change: function(togglefield, newValue, oldValue, eOpts) {
+        this.websocketSend(Ext.encode({
+            action:'internetControl',
+            enabled:newValue,
+            server:this.queryById('internetServer').getValue(),
+            key:this.queryById('internetKey').getValue()
+        }));
+    },
+
+    onTabpanelActiveItemChange: function(sender, value, oldValue, eOpts) {
+        console.log('tab change!');
+        console.log(arguments);
+        console.log(value.getItemId());
+
+        switch(value.getItemId()){
+            case 'tabVideo':
+                this.startVideo();
+        }
+    },
+
     onFormpanelPainted: function(sender, element, eOpts) {
         this.webSocketCon = null;
         this.websocketOpen();
@@ -990,14 +1062,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         this.wsRightStickY = -1;
         this.wsTriggerRight = -1;
 
-
-    },
-
-    onTabpanelActiveItemChange: function(sender, value, oldValue, eOpts) {
-        switch(value.getItemId()){
-            case 'tabVideo':
-                this.startVideo();
-        }
+        this.messageQueue = [];
     },
 
     trexscream: function() {
@@ -1012,9 +1077,14 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
         }));
     },
 
-    websocketSend: function(message) {
+    websocketSend: function(message, queue) {
+        var queueP = queue || false;
+
         if(this.webSocketCon === null || this.webSocketCon.readyState !== WebSocket.OPEN){
             console.log('Sending to WebSocket failed - not connected');
+            if(queueP){
+                this.messageQueue.push(message);
+            }
             return false;
         }
 
@@ -1046,6 +1116,11 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
                 this.websocketSend(Ext.encode({
                     action:'getStatus'
                 }));
+                if(this.messageQueue.length > 0){
+                    Ext.each(this.messageQueue, function(msg){
+                        this.websocketSend(msg);
+                    }, this);
+                }
         	}.bind(this);
 
         	this.webSocketCon.onmessage = this.websocketReceive.bind(this);
@@ -1400,7 +1475,7 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
 
         this.websocketSend(Ext.encode({
             action:'startVideo'
-        }));
+        }), true);
 
         if(!this.videoStreamPlayer){
             var canvas = document.getElementById('video-canvas');
