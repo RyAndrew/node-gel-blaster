@@ -53,6 +53,9 @@ var internetControlWebSocket = null;
 var internetControlUrl = internetVideoUrl;
 var internetControlUrlPath = '/control';
 
+var messageLocal = 1;
+var messageInternet = 2;
+
 // PCA9685 options
 var options = {
 	i2c: i2cBus.openSync(1),
@@ -149,7 +152,7 @@ webSocketServer.on('connection', function connection(ws, req) {
 	console.log('connection from ' + ip);
 
 	 ws.on('message', function(message){
-	 	handleIncomingControlMessage(ws, message);
+	 	handleIncomingControlMessage(ws, message, messageLocal);
 	});
 
 	ws.on('close', function clear() {
@@ -341,7 +344,7 @@ function internetControlWebSocketConnect(){
 }
 function internetControlWebSocketMessageRecieved(message){
 	console.log('internet control websocket, msg rcvd: "%s"', message);
-	handleIncomingControlMessage(false, message);
+	handleIncomingControlMessage(false, message, messageInternet);
 }
 function InternetControlWebsocketSend(msg){
 	if(!internetControlWebSocket || internetControlWebSocket.readyState !== WebSocket.OPEN){
@@ -356,7 +359,7 @@ function InternetControlWebsocketSend(msg){
 
 
 
-function handleIncomingControlMessage(wsp, message) {
+function handleIncomingControlMessage(wsp, message, source) {
 	var ws = wsp || false;
 	console.log('control, revc: "%s"', message);
 	
@@ -431,6 +434,10 @@ function handleIncomingControlMessage(wsp, message) {
 
 			break;
 		case "setShoot":
+			if(source === messageInternet){
+				console.log('disregarding shoot from internet');
+				return;
+			}
 			if(!messageJson.hasOwnProperty('value')){
 				console.log('control, setShoot, missing value');
 				return;
