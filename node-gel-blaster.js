@@ -310,12 +310,12 @@ function internetVideoSendAudioData(data){
 
 
 function internetControlStart(){
-	internetControlWebSocketConnect();
 	internetControlStarted = true;
+	internetControlWebSocketConnect();
 }
 function internetControlStop(){
-	internetControlWebSocketClose();
 	internetControlStarted = false;
+	internetControlWebSocketClose();
 }
 function internetControlWebSocketClose(){
 	if(internetControlWebSocket !== null ){
@@ -323,10 +323,15 @@ function internetControlWebSocketClose(){
 	}
 }
 function internetControlWebSocketConnect(){
-	if(internetControlWebSocket !== null){
+	if(internetControlStarted === false){
+		console.log('internet control websocket, not connecting, internetControlDisabled');
 		return;
 	}
-	console.log('internet control target websocket, connecting to '+internetControlUrl);
+	if(internetControlWebSocket !== null){
+		console.log('internet control websocket, already active');
+		return;
+	}
+	console.log('internet control websocket, connecting to '+internetControlUrl);
 	internetControlWebSocket = new WebSocket('ws://'+internetControlUrl+ internetControlUrlPath);
 	internetControlWebSocket.on('open', function() {
 		console.log('internet control websocket, connection Opened to '+internetControlUrl);
@@ -340,11 +345,10 @@ function internetControlWebSocketConnect(){
 		console.log('internet control websocket, connection Error ',error.code);
 	});
 
-	internetControlWebSocket.on('message', internetControlWebSocketMessageRecieved);
-}
-function internetControlWebSocketMessageRecieved(message){
-	console.log('internet control websocket, msg rcvd: "%s"', message);
-	handleIncomingControlMessage(false, message, messageInternet);
+	internetControlWebSocket.on('message', function(message){
+		console.log('internet control websocket, msg rcvd: "%s"', message);
+		handleIncomingControlMessage(false, message, messageInternet);
+	});
 }
 function InternetControlWebsocketSend(msg){
 	if(!internetControlWebSocket || internetControlWebSocket.readyState !== WebSocket.OPEN){
