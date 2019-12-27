@@ -6,6 +6,7 @@
     },
     "codeClass": null,
     "userConfig": {
+        "activeItem": 1,
         "designer|initialView": true,
         "designer|userAlias": "gelblasterpanel",
         "designer|userClassName": "GelBlasterPanel",
@@ -17,12 +18,1561 @@
         "designer|userClassName": "string",
         "fullscreen": "boolean",
         "scrollable": "auto",
-        "title": "string"
+        "title": "string",
+        "activeItem": "number"
     },
     "designerId": "b2f39c25-2aa9-445d-8149-537c726e51f5",
     "viewControllerInstanceId": "c2fcd374-9b5c-4853-ba64-ff821433b1d3",
     "viewModelInstanceId": "5860a2a4-649c-4332-ad24-582babee6904",
     "cn": [
+        {
+            "type": "Ext.tab.Panel",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "activeItem": 1,
+                "title": "Config"
+            },
+            "configAlternates": {
+                "activeItem": "number",
+                "title": "string"
+            },
+            "name": "MyTabPanel",
+            "designerId": "487f962c-a6f3-490c-8743-e1edda1aac61",
+            "cn": [
+                {
+                    "type": "Ext.Container",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "padding": 10,
+                        "title": "Hardware"
+                    },
+                    "configAlternates": {
+                        "padding": "auto",
+                        "title": "string"
+                    },
+                    "name": "MyContainer31",
+                    "designerId": "1095ece9-9da4-4134-9c60-576cb687d6e3",
+                    "cn": [
+                        {
+                            "type": "Ext.field.ComboBox",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "label": "PWM Type",
+                                "labelWidth": 75,
+                                "margin": "10 0 0 10",
+                                "name": "pwmType",
+                                "width": 250
+                            },
+                            "configAlternates": {
+                                "label": "string",
+                                "labelWidth": "auto",
+                                "margin": "auto",
+                                "name": "string",
+                                "width": "auto"
+                            },
+                            "name": "MyComboBox",
+                            "designerId": "ff7cf5d1-5b0c-447a-b28f-30a77e9f5be7"
+                        },
+                        {
+                            "type": "Ext.form.FieldSet",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "title": "Left Drive"
+                            },
+                            "configAlternates": {
+                                "title": "string"
+                            },
+                            "name": "MyFieldSet",
+                            "designerId": "17430e15-6b23-448a-8714-4eac1d134404",
+                            "cn": [
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "itemId": "left1",
+                                        "layout": "hbox"
+                                    },
+                                    "configAlternates": {
+                                        "itemId": "string",
+                                        "layout": "string"
+                                    },
+                                    "name": "MyContainer32",
+                                    "designerId": "45fb22e2-afa1-4556-b839-7f4ac047719a",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Left 1 Chan",
+                                                "labelWidth": 85,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1no",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField7",
+                                            "designerId": "fdf9e135-1475-4b76-a532-a76fcccff4e7"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Min",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1min",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField8",
+                                            "designerId": "9e96d711-1af7-4205-b092-2e8dfb696949"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Mid",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1mid",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField9",
+                                            "designerId": "fcddfb95-845f-45ee-a16f-5c498192bd16"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Max",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1max",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField10",
+                                            "designerId": "aee23305-ac1b-42d8-ab56-27a8e4310f0f"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "itemId": "left2",
+                                        "layout": "hbox",
+                                        "margin": "10 0 0 0"
+                                    },
+                                    "configAlternates": {
+                                        "itemId": "string",
+                                        "layout": "string",
+                                        "margin": "auto"
+                                    },
+                                    "name": "MyContainer33",
+                                    "designerId": "1943cfb1-8dba-4f61-b5dc-c32228f5be1d",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Left 2 Chan",
+                                                "labelWidth": 85,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1no",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField7",
+                                            "designerId": "e32b3e7b-caeb-4284-9347-8131557f8f83"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Min",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1min",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField8",
+                                            "designerId": "5dfb4ea7-2501-4adf-9abf-d9ebde1a64b3"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Mid",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1mid",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField9",
+                                            "designerId": "71dd70bc-2149-4a4e-aa0f-87198d743676"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Max",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1max",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField10",
+                                            "designerId": "4ac536b8-7aab-4ce5-9f14-108e7931736c"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.FieldSet",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "title": "Right Drive"
+                            },
+                            "configAlternates": {
+                                "title": "string"
+                            },
+                            "name": "MyFieldSet1",
+                            "designerId": "98461b0c-96bb-46cd-a181-b3c6e6e068e3",
+                            "cn": [
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "itemId": "right1",
+                                        "layout": "hbox"
+                                    },
+                                    "configAlternates": {
+                                        "itemId": "string",
+                                        "layout": "string"
+                                    },
+                                    "name": "MyContainer32",
+                                    "designerId": "a49b80f6-c9ca-4543-ac88-743efbaa1a69",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Right 1 Chan",
+                                                "labelWidth": 85,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1no",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField7",
+                                            "designerId": "63a30cf4-b1a3-43bb-9989-7478871032e8"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Min",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1min",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField8",
+                                            "designerId": "2c3a7af3-54ec-400c-86a5-f68991bab158"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Mid",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1mid",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField9",
+                                            "designerId": "e2eda0ed-62f4-4133-bf15-bf9d73e4b504"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Max",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1max",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField10",
+                                            "designerId": "89f49b90-74ea-4648-96f1-0c195b6bb000"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "itemId": "right2",
+                                        "layout": "hbox",
+                                        "margin": "10 0 0 0"
+                                    },
+                                    "configAlternates": {
+                                        "itemId": "string",
+                                        "layout": "string",
+                                        "margin": "auto"
+                                    },
+                                    "name": "MyContainer33",
+                                    "designerId": "abf6c921-99e2-4ff1-8230-8f3509f26433",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Right 2 Chan",
+                                                "labelWidth": 85,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1no",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField7",
+                                            "designerId": "67c12270-3ec0-45cc-85cd-bbf137d26145"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Min",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1min",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField8",
+                                            "designerId": "cbf64b4d-7b43-4add-888f-e32e0d74ecf6"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Mid",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1mid",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField9",
+                                            "designerId": "ff39715b-e7b7-4483-9271-431071496b34"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Max",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1max",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField10",
+                                            "designerId": "0c094514-312f-4211-8f33-0d271383380e"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.FieldSet",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "title": "Camera"
+                            },
+                            "configAlternates": {
+                                "title": "string"
+                            },
+                            "name": "MyFieldSet2",
+                            "designerId": "2b3736f0-0911-4e63-97e4-346234978d09",
+                            "cn": [
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "itemId": "pan",
+                                        "layout": "hbox"
+                                    },
+                                    "configAlternates": {
+                                        "itemId": "string",
+                                        "layout": "string"
+                                    },
+                                    "name": "MyContainer32",
+                                    "designerId": "0db95f45-413c-4ab8-8409-c483debb906a",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Pan Chan",
+                                                "labelWidth": 85,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1no",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField7",
+                                            "designerId": "c879986f-5490-400b-9d08-1fb4097fdfdb"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Min",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1min",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField8",
+                                            "designerId": "0d8301be-15a2-4e46-81dd-444df4a42be3"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Mid",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1mid",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField9",
+                                            "designerId": "5a21d06c-22ab-4fec-8b4b-42c0b3a3ed90"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Max",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1max",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField10",
+                                            "designerId": "3986034e-5028-4d68-a9c7-ef0c87f7a5e0"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "itemId": "tilt",
+                                        "layout": "hbox",
+                                        "margin": "10 0 0 0"
+                                    },
+                                    "configAlternates": {
+                                        "itemId": "string",
+                                        "layout": "string",
+                                        "margin": "auto"
+                                    },
+                                    "name": "MyContainer33",
+                                    "designerId": "37b56fef-9ed3-4828-93f0-454299860e74",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Tilt Chan",
+                                                "labelWidth": 85,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1no",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField7",
+                                            "designerId": "d6cd9d6c-b34a-4ccc-9b4e-edae0b852a82"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Min",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1min",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField8",
+                                            "designerId": "37d1eb77-7c8f-4dfe-b961-108d747f8c2b"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Mid",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1mid",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField9",
+                                            "designerId": "714d3e0c-d10f-4277-ba43-c5f9ed8788d2"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Max",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1max",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField10",
+                                            "designerId": "1a20eeea-c995-44ab-a4da-899aab61f817"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.FieldSet",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "title": "Aux"
+                            },
+                            "configAlternates": {
+                                "title": "string"
+                            },
+                            "name": "MyFieldSet3",
+                            "designerId": "40b801e7-9560-44a4-bd9e-c5cfa3174765",
+                            "cn": [
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "itemId": "aux1",
+                                        "layout": "hbox"
+                                    },
+                                    "configAlternates": {
+                                        "itemId": "string",
+                                        "layout": "string"
+                                    },
+                                    "name": "MyContainer32",
+                                    "designerId": "196c8d12-fcc9-400c-bd40-582e38e29685",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Aux 1 Chan",
+                                                "labelWidth": 85,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1no",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField7",
+                                            "designerId": "434fee8d-23ca-4241-8fde-03d16c17cd72"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Min",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1min",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField8",
+                                            "designerId": "da19fe4e-8850-43c2-97c3-6d35d9b9827e"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Mid",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1mid",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField9",
+                                            "designerId": "361d6903-951e-4434-a972-c9fa94934a77"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Max",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1max",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField10",
+                                            "designerId": "735a918c-23cf-4c4a-b48c-2cbb3dcb7320"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "itemId": "aux2",
+                                        "layout": "hbox",
+                                        "margin": "10 0 0 0"
+                                    },
+                                    "configAlternates": {
+                                        "itemId": "string",
+                                        "layout": "string",
+                                        "margin": "auto"
+                                    },
+                                    "name": "MyContainer33",
+                                    "designerId": "07ab021c-2ee6-45cf-8fbf-950c9d67ef8e",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Aux 2 Chan",
+                                                "labelWidth": 85,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1no",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField7",
+                                            "designerId": "6c80d390-4d11-4520-8a5e-9b28184799e2"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Min",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1min",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField8",
+                                            "designerId": "0b4b2fd3-ff76-46a1-bae7-807e917e129f"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Mid",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1mid",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField9",
+                                            "designerId": "50188364-3193-4bf6-8234-a6bbcdc9af8b"
+                                        },
+                                        {
+                                            "type": "Ext.field.Number",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Max",
+                                                "labelWidth": 50,
+                                                "margin": "0 0 0 10",
+                                                "name": "leftch1max",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "name": "string",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyNumberField10",
+                                            "designerId": "05ce0727-d144-4a1c-94e9-45030b316279"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.Container",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "padding": 10,
+                        "title": "Button Mapping"
+                    },
+                    "configAlternates": {
+                        "padding": "auto",
+                        "title": "string"
+                    },
+                    "name": "MyContainer34",
+                    "designerId": "72899836-134a-4f9a-b13d-9040401e05b7",
+                    "cn": [
+                        {
+                            "type": "Ext.form.FieldSet",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "title": "xbox controller"
+                            },
+                            "configAlternates": {
+                                "title": "string"
+                            },
+                            "name": "MyFieldSet4",
+                            "designerId": "af7c13d6-0ea8-46de-b01a-44a92e393df9",
+                            "cn": [
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "layout": "hbox"
+                                    },
+                                    "configAlternates": {
+                                        "layout": "string"
+                                    },
+                                    "name": "MyContainer35",
+                                    "designerId": "8384df4a-71a1-4d74-a93a-9a0c16d083e7",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "L1",
+                                                "labelWidth": 35,
+                                                "margin": "10 0 0 10",
+                                                "width": 175
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox2",
+                                            "designerId": "e86e2e2d-c663-46d0-8bba-d5831fd72b53"
+                                        },
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "R1",
+                                                "labelWidth": 35,
+                                                "margin": "10 0 0 10",
+                                                "width": 175
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox3",
+                                            "designerId": "c420844a-e3bb-4645-bad1-ce581e06edbf"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "layout": "hbox"
+                                    },
+                                    "configAlternates": {
+                                        "layout": "string"
+                                    },
+                                    "name": "MyContainer36",
+                                    "designerId": "1a4570f8-bc47-4b6a-b61d-097ab690d37b",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "L2",
+                                                "labelWidth": 35,
+                                                "margin": "10 0 0 10",
+                                                "width": 175
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox2",
+                                            "designerId": "62ef9508-31b3-4942-8be3-d7d7bf48a97c"
+                                        },
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "R2",
+                                                "labelWidth": 35,
+                                                "margin": "10 0 0 10",
+                                                "width": 175
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox3",
+                                            "designerId": "2f50a545-9cbb-471d-8779-4dfb22b37865"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "layout": "hbox"
+                                    },
+                                    "configAlternates": {
+                                        "layout": "string"
+                                    },
+                                    "name": "MyContainer37",
+                                    "designerId": "f6a18a4a-907d-40f7-8b2e-e987a2e7ce4e",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Left Stick",
+                                                "labelWidth": 75,
+                                                "margin": "10 0 0 10",
+                                                "width": 200
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox2",
+                                            "designerId": "7bffa36e-c1e3-4dce-aa6a-bbfd0149ab94"
+                                        },
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Right Stick",
+                                                "labelWidth": 75,
+                                                "margin": "10 0 0 10",
+                                                "width": 200
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox3",
+                                            "designerId": "47fcad86-5ac9-4d36-8c11-d6aafd4875e2"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "layout": "hbox"
+                                    },
+                                    "configAlternates": {
+                                        "layout": "string"
+                                    },
+                                    "name": "MyContainer39",
+                                    "designerId": "826a5c26-b36b-4dbd-949c-56a9b80489a3",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "X",
+                                                "labelWidth": 35,
+                                                "margin": "10 0 0 10",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox2",
+                                            "designerId": "43db27ad-fc75-453b-86e9-eccbeb6a010f"
+                                        },
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Y",
+                                                "labelWidth": 35,
+                                                "margin": "10 0 0 10",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox4",
+                                            "designerId": "f9ca74b1-3336-468c-9cc2-8ca00f80eac1"
+                                        },
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "A",
+                                                "labelWidth": 35,
+                                                "margin": "10 0 0 10",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox3",
+                                            "designerId": "348edd9d-f0d8-4e13-b474-a4b1804bdcd6"
+                                        },
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "B",
+                                                "labelWidth": 35,
+                                                "margin": "10 0 0 10",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox5",
+                                            "designerId": "2f023b1a-a388-4f48-8c35-dff68734f013"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Ext.Container",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "layout": "hbox"
+                                    },
+                                    "configAlternates": {
+                                        "layout": "string"
+                                    },
+                                    "name": "MyContainer41",
+                                    "designerId": "662b39da-e147-4d36-a931-632cb47c43c8",
+                                    "cn": [
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Up",
+                                                "labelWidth": 55,
+                                                "margin": "10 0 0 10",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox2",
+                                            "designerId": "dad75d46-085f-4a58-93e4-557a588a4330"
+                                        },
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Down",
+                                                "labelWidth": 55,
+                                                "margin": "10 0 0 10",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox4",
+                                            "designerId": "f5193deb-0797-4675-b240-f4a582bdc095"
+                                        },
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Left",
+                                                "labelWidth": 55,
+                                                "margin": "10 0 0 10",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox3",
+                                            "designerId": "262633d9-1482-4f95-a46f-fa585f7718c9"
+                                        },
+                                        {
+                                            "type": "Ext.field.ComboBox",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "label": "Right",
+                                                "labelWidth": 55,
+                                                "margin": "10 0 0 10",
+                                                "width": 150
+                                            },
+                                            "configAlternates": {
+                                                "label": "string",
+                                                "labelWidth": "auto",
+                                                "margin": "auto",
+                                                "width": "auto"
+                                            },
+                                            "name": "MyComboBox5",
+                                            "designerId": "59ce0255-c3b6-47b5-bc55-6b85498c8bda"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.Container",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "layout": "fit",
+                        "title": "Import/Export"
+                    },
+                    "configAlternates": {
+                        "layout": "string",
+                        "title": "string"
+                    },
+                    "name": "MyContainer43",
+                    "designerId": "ce27cbf0-ecef-4d11-b953-d9aaf0c873af",
+                    "cn": [
+                        {
+                            "type": "Ext.field.TextArea",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "label": "Full Config",
+                                "labelAlign": "top",
+                                "margin": 10
+                            },
+                            "configAlternates": {
+                                "label": "string",
+                                "labelAlign": "string",
+                                "margin": "auto"
+                            },
+                            "name": "MyTextArea",
+                            "designerId": "da2ac0c8-f310-4228-9eb0-647976663a41"
+                        }
+                    ]
+                }
+            ]
+        },
         {
             "type": "Ext.Panel",
             "reference": {
@@ -3113,49 +4663,50 @@
             "userConfig": {
                 "fn": "websocketOpen",
                 "implHandler": [
-                    "    if(this.webSocketCon !== null &&",
-                    "       ( this.webSocketCon.readyState === WebSocket.CONNECTING ||",
-                    "        this.webSocketCon.readyState === WebSocket.OPEN )",
-                    "    ){",
-                    "        //if the socket is already open, or connecting. dont open more than 1",
-                    "        this.appendDebugOutput(\"Websocket already open or connecting\");",
-                    "        return;",
+                    "if(this.webSocketCon !== null &&",
+                    "   ( this.webSocketCon.readyState === WebSocket.CONNECTING ||",
+                    "    this.webSocketCon.readyState === WebSocket.OPEN )",
+                    "  ){",
+                    "    //if the socket is already open, or connecting. dont open more than 1",
+                    "    this.appendDebugOutput(\"Websocket already open or connecting\");",
+                    "    return;",
+                    "}",
+                    "",
+                    "this.appendDebugOutput(\"Opening Websocket\");",
+                    "",
+                    "try{",
+                    "    this.webSocketCon = new WebSocket('ws://'+window.location.host+'/wsapi');",
+                    "}catch(err){",
+                    "    this.appendDebugOutput(\"Exception opening socket!\");",
+                    "    this.appendDebugOutput(err.message);",
+                    "    this.webSocketCon = null;",
+                    "    return false;",
+                    "}",
+                    "",
+                    "this.webSocketCon.onopen = function(){",
+                    "    this.websocketSend(Ext.encode({",
+                    "        action:'getStatus'",
+                    "    }));",
+                    "    if(this.messageQueue.length > 0){",
+                    "        Ext.each(this.messageQueue, function(msg){",
+                    "            this.websocketSend(msg);",
+                    "        }, this);",
+                    "        this.messageQueue = [];",
                     "    }",
+                    "}.bind(this);",
                     "",
-                    "    this.appendDebugOutput(\"Opening Websocket\");",
+                    "this.webSocketCon.onmessage = this.websocketReceive.bind(this);",
                     "",
-                    "    try{",
-                    "        this.webSocketCon = new WebSocket('ws://'+window.location.host+'/wsapi');",
-                    "    }catch(err){",
-                    "        this.appendDebugOutput(\"Exception opening socket!\");",
-                    "        this.appendDebugOutput(err.message);",
-                    "        this.webSocketCon = null;",
-                    "        return false;",
-                    "    }",
+                    "this.webSocketCon.onerror = function(event){",
+                    "    this.appendDebugOutput(\"error with websocket! \" + event.error);",
+                    "}.bind(this);",
                     "",
-                    "\tthis.webSocketCon.onopen = function(){",
-                    "        this.websocketSend(Ext.encode({",
-                    "            action:'getStatus'",
-                    "        }));",
-                    "        if(this.messageQueue.length > 0){",
-                    "            Ext.each(this.messageQueue, function(msg){",
-                    "                this.websocketSend(msg);",
-                    "            }, this);",
-                    "        }",
-                    "\t}.bind(this);",
+                    "this.webSocketCon.onclose = function(event){",
+                    "    this.appendDebugOutput(\"websocket closed! \"+event.code+\" \"+event.reason);",
                     "",
-                    "\tthis.webSocketCon.onmessage = this.websocketReceive.bind(this);",
-                    "",
-                    "\tthis.webSocketCon.onerror = function(event){",
-                    "\t\tthis.appendDebugOutput(\"error with websocket! \" + event.error);",
-                    "\t}.bind(this);",
-                    "",
-                    "\tthis.webSocketCon.onclose = function(event){",
-                    "\t\tthis.appendDebugOutput(\"websocket closed! \"+event.code+\" \"+event.reason);",
-                    "",
-                    "        this.webSocketCon = null;",
-                    "        this.websocketReconnect();",
-                    "\t}.bind(this);",
+                    "    this.webSocketCon = null;",
+                    "    this.websocketReconnect();",
+                    "}.bind(this);",
                     "",
                     ""
                 ]

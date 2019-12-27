@@ -4,7 +4,7 @@
         "cmd": {},
         "urlPrefixTemplate": "http://localhost:{port}/{path}",
         "urlPrefix": "http://localhost/",
-        "exportPath": "J:/Data/ApacheData/dev.local/gelblaster",
+        "exportPath": "C:/ForkRepos/node-gel-blaster/webroot",
         "buildShouldOverwriteIndex": true,
         "generateArchitectVersion": false,
         "spacesToIndent": 4,
@@ -23,10 +23,12 @@
         },
         "displayfield-ExtBox1-1118-inputEl": "a new version of the framework is available",
         "displayfield-ExtBox1-1231-inputEl": "a new version of the framework is available",
-        "displayfield-ExtBox1-1180-inputEl": "a new version of the framework is available"
+        "displayfield-ExtBox1-1180-inputEl": "a new version of the framework is available",
+        "displayfield-ExtBox1-1121-inputEl": "a new version of the framework is available",
+        "displayfield-ExtBox1-1179-inputEl": "a new version of the framework is available"
     },
-    "xdsVersion": "4.2.5",
-    "xdsBuild": 420,
+    "xdsVersion": "4.2.6",
+    "xdsBuild": 425,
     "schemaVersion": 1,
     "upgradeVersion": 310000000001,
     "framework": "modern65",
@@ -40,7 +42,7 @@
         "controller": [],
         "model": [],
         "resource": [
-            "0c022e25-38e2-46bb-a65a-9656cfc8c752",
+            "2f968709-36e0-43fb-ac34-15089bf0ee37",
             "0bed7e48-343e-4468-9c92-33f050cfcaf9",
             "d106f179-4cce-400b-b64e-9d1b1d7b01e5",
             "ba1b60b1-aa59-47c9-bd29-a22025542c35",

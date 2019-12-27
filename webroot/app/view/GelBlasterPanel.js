@@ -19,9 +19,13 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
 
     requires: [
         'GelBlaster.view.GelBlasterPanelViewModel',
+        'Ext.tab.Panel',
+        'Ext.field.ComboBox',
+        'Ext.form.FieldSet',
+        'Ext.field.Number',
+        'Ext.field.TextArea',
         'Ext.Panel',
         'Ext.Button',
-        'Ext.field.Number',
         'Ext.chart.CartesianChart',
         'Ext.chart.axis.Numeric',
         'Ext.chart.series.Line',
@@ -31,10 +35,527 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
     viewModel: {
         type: 'gelblasterpanel'
     },
+    activeItem: 1,
     fullscreen: true,
     defaultListenerScope: true,
 
     items: [
+        {
+            xtype: 'tabpanel',
+            title: 'Config',
+            activeItem: 1,
+            items: [
+                {
+                    xtype: 'container',
+                    title: 'Hardware',
+                    padding: 10,
+                    items: [
+                        {
+                            xtype: 'combobox',
+                            name: 'pwmType',
+                            width: 250,
+                            margin: '10 0 0 10',
+                            label: 'PWM Type',
+                            labelWidth: 75
+                        },
+                        {
+                            xtype: 'fieldset',
+                            title: 'Left Drive',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'left1',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1no',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Left 1 Chan',
+                                            labelWidth: 85
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1min',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Min',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1mid',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Mid',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1max',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Max',
+                                            labelWidth: 50
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'container',
+                                    itemId: 'left2',
+                                    margin: '10 0 0 0',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1no',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Left 2 Chan',
+                                            labelWidth: 85
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1min',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Min',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1mid',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Mid',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1max',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Max',
+                                            labelWidth: 50
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'fieldset',
+                            title: 'Right Drive',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'right1',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1no',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Right 1 Chan',
+                                            labelWidth: 85
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1min',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Min',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1mid',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Mid',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1max',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Max',
+                                            labelWidth: 50
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'container',
+                                    itemId: 'right2',
+                                    margin: '10 0 0 0',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1no',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Right 2 Chan',
+                                            labelWidth: 85
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1min',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Min',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1mid',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Mid',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1max',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Max',
+                                            labelWidth: 50
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'fieldset',
+                            title: 'Camera',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'pan',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1no',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Pan Chan',
+                                            labelWidth: 85
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1min',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Min',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1mid',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Mid',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1max',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Max',
+                                            labelWidth: 50
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'container',
+                                    itemId: 'tilt',
+                                    margin: '10 0 0 0',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1no',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Tilt Chan',
+                                            labelWidth: 85
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1min',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Min',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1mid',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Mid',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1max',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Max',
+                                            labelWidth: 50
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'fieldset',
+                            title: 'Aux',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    itemId: 'aux1',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1no',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Aux 1 Chan',
+                                            labelWidth: 85
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1min',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Min',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1mid',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Mid',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1max',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Max',
+                                            labelWidth: 50
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'container',
+                                    itemId: 'aux2',
+                                    margin: '10 0 0 0',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1no',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Aux 2 Chan',
+                                            labelWidth: 85
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1min',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Min',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1mid',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Mid',
+                                            labelWidth: 50
+                                        },
+                                        {
+                                            xtype: 'numberfield',
+                                            name: 'leftch1max',
+                                            width: 150,
+                                            margin: '0 0 0 10',
+                                            label: 'Max',
+                                            labelWidth: 50
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
+                    title: 'Button Mapping',
+                    padding: 10,
+                    items: [
+                        {
+                            xtype: 'fieldset',
+                            title: 'xbox controller',
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'combobox',
+                                            width: 175,
+                                            margin: '10 0 0 10',
+                                            label: 'L1',
+                                            labelWidth: 35
+                                        },
+                                        {
+                                            xtype: 'combobox',
+                                            width: 175,
+                                            margin: '10 0 0 10',
+                                            label: 'R1',
+                                            labelWidth: 35
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'container',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'combobox',
+                                            width: 175,
+                                            margin: '10 0 0 10',
+                                            label: 'L2',
+                                            labelWidth: 35
+                                        },
+                                        {
+                                            xtype: 'combobox',
+                                            width: 175,
+                                            margin: '10 0 0 10',
+                                            label: 'R2',
+                                            labelWidth: 35
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'container',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'combobox',
+                                            width: 200,
+                                            margin: '10 0 0 10',
+                                            label: 'Left Stick',
+                                            labelWidth: 75
+                                        },
+                                        {
+                                            xtype: 'combobox',
+                                            width: 200,
+                                            margin: '10 0 0 10',
+                                            label: 'Right Stick',
+                                            labelWidth: 75
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'container',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'combobox',
+                                            width: 150,
+                                            margin: '10 0 0 10',
+                                            label: 'X',
+                                            labelWidth: 35
+                                        },
+                                        {
+                                            xtype: 'combobox',
+                                            width: 150,
+                                            margin: '10 0 0 10',
+                                            label: 'Y',
+                                            labelWidth: 35
+                                        },
+                                        {
+                                            xtype: 'combobox',
+                                            width: 150,
+                                            margin: '10 0 0 10',
+                                            label: 'A',
+                                            labelWidth: 35
+                                        },
+                                        {
+                                            xtype: 'combobox',
+                                            width: 150,
+                                            margin: '10 0 0 10',
+                                            label: 'B',
+                                            labelWidth: 35
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'container',
+                                    layout: 'hbox',
+                                    items: [
+                                        {
+                                            xtype: 'combobox',
+                                            width: 150,
+                                            margin: '10 0 0 10',
+                                            label: 'Up',
+                                            labelWidth: 55
+                                        },
+                                        {
+                                            xtype: 'combobox',
+                                            width: 150,
+                                            margin: '10 0 0 10',
+                                            label: 'Down',
+                                            labelWidth: 55
+                                        },
+                                        {
+                                            xtype: 'combobox',
+                                            width: 150,
+                                            margin: '10 0 0 10',
+                                            label: 'Left',
+                                            labelWidth: 55
+                                        },
+                                        {
+                                            xtype: 'combobox',
+                                            width: 150,
+                                            margin: '10 0 0 10',
+                                            label: 'Right',
+                                            labelWidth: 55
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
+                    title: 'Import/Export',
+                    layout: 'fit',
+                    items: [
+                        {
+                            xtype: 'textareafield',
+                            margin: 10,
+                            label: 'Full Config',
+                            labelAlign: 'top'
+                        }
+                    ]
+                }
+            ]
+        },
         {
             xtype: 'panel',
             itemId: 'tabControls',
@@ -1022,6 +1543,10 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
     },
 
     onTabpanelActiveItemChange: function(sender, value, oldValue, eOpts) {
+        console.log('tab change!');
+        console.log(arguments);
+        console.log(value.getItemId());
+
         switch(value.getItemId()){
             case 'tabVideo':
                 this.startVideo();
@@ -1088,49 +1613,50 @@ Ext.define('GelBlaster.view.GelBlasterPanel', {
     },
 
     websocketOpen: function() {
-            if(this.webSocketCon !== null &&
-               ( this.webSocketCon.readyState === WebSocket.CONNECTING ||
-                this.webSocketCon.readyState === WebSocket.OPEN )
-            ){
-                //if the socket is already open, or connecting. dont open more than 1
-                this.appendDebugOutput("Websocket already open or connecting");
-                return;
+        if(this.webSocketCon !== null &&
+           ( this.webSocketCon.readyState === WebSocket.CONNECTING ||
+            this.webSocketCon.readyState === WebSocket.OPEN )
+          ){
+            //if the socket is already open, or connecting. dont open more than 1
+            this.appendDebugOutput("Websocket already open or connecting");
+            return;
+        }
+
+        this.appendDebugOutput("Opening Websocket");
+
+        try{
+            this.webSocketCon = new WebSocket('ws://'+window.location.host+'/wsapi');
+        }catch(err){
+            this.appendDebugOutput("Exception opening socket!");
+            this.appendDebugOutput(err.message);
+            this.webSocketCon = null;
+            return false;
+        }
+
+        this.webSocketCon.onopen = function(){
+            this.websocketSend(Ext.encode({
+                action:'getStatus'
+            }));
+            if(this.messageQueue.length > 0){
+                Ext.each(this.messageQueue, function(msg){
+                    this.websocketSend(msg);
+                }, this);
+                this.messageQueue = [];
             }
+        }.bind(this);
 
-            this.appendDebugOutput("Opening Websocket");
+        this.webSocketCon.onmessage = this.websocketReceive.bind(this);
 
-            try{
-                this.webSocketCon = new WebSocket('ws://'+window.location.host+'/wsapi');
-            }catch(err){
-                this.appendDebugOutput("Exception opening socket!");
-                this.appendDebugOutput(err.message);
-                this.webSocketCon = null;
-                return false;
-            }
+        this.webSocketCon.onerror = function(event){
+            this.appendDebugOutput("error with websocket! " + event.error);
+        }.bind(this);
 
-        	this.webSocketCon.onopen = function(){
-                this.websocketSend(Ext.encode({
-                    action:'getStatus'
-                }));
-                if(this.messageQueue.length > 0){
-                    Ext.each(this.messageQueue, function(msg){
-                        this.websocketSend(msg);
-                    }, this);
-                }
-        	}.bind(this);
+        this.webSocketCon.onclose = function(event){
+            this.appendDebugOutput("websocket closed! "+event.code+" "+event.reason);
 
-        	this.webSocketCon.onmessage = this.websocketReceive.bind(this);
-
-        	this.webSocketCon.onerror = function(event){
-        		this.appendDebugOutput("error with websocket! " + event.error);
-        	}.bind(this);
-
-        	this.webSocketCon.onclose = function(event){
-        		this.appendDebugOutput("websocket closed! "+event.code+" "+event.reason);
-
-                this.webSocketCon = null;
-                this.websocketReconnect();
-        	}.bind(this);
+            this.webSocketCon = null;
+            this.websocketReconnect();
+        }.bind(this);
 
 
     },
